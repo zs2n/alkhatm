@@ -1,0 +1,19 @@
+{
+  "name": "الختم",
+  "short_name": "الختم",
+  "description": "لعبة بيكسل آرت لليوم العالمي لمكافحة الفساد: افحص المعاملات واختم بالقرار الصحيح.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#121916",
+  "theme_color": "#121916",
+  "categories": ["games", "education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

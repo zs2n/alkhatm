@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#121916">
+<meta name="description" content="لعبة بيكسل آرت لليوم العالمي لمكافحة الفساد: افحص المعاملات واختم بالاعتماد أو الرفض.">
+<meta property="og:title" content="الختم">
+<meta property="og:description" content="افحص المعاملات، ارفض الرشوة، واختم بالقرار الصحيح.">
+<meta property="og:image" content="https://zs2n.github.io/alkhatm/icons/icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}*{box-sizing:border-box}body{margin:0}</style>
+<title>الختم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;800&family=Noto+Naskh+Arabic:wght@400;600;700&family=Reem+Kufi:wght@700&display=swap">
+<style>
+/* Layout: one phone-sized column — pixel office scene on top, dialogue, suspicion meter, then three big stamp buttons. Single dark look by design. */
+:root {
+  color-scheme: dark;
+  --ink: #121916;
+  --panel: #1C2622;
+  --panel-2: #24332C;
+  --line: #3F6352;
+  --paper: #F5EFDC;
+  --paper-ink: #2A2420;
+  --paper-rule: #D8CDAE;
+  --text: #EDE7D6;
+  --muted: #A9B5AE;
+  --gold: #E9A23B;
+  --red: #C0392B;
+  --red-d: #7E2A20;
+  --green: #2E9467;
+  --green-d: #1E5E45;
+  --f-display: "Reem Kufi", "Noto Kufi Arabic", "Segoe UI", Tahoma, sans-serif;
+  --f-ui: "Noto Kufi Arabic", "Segoe UI", Tahoma, sans-serif;
+  --f-doc: "Noto Naskh Arabic", "Times New Roman", serif;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { background: var(--ink); color: var(--text); font-family: var(--f-ui); margin: 0; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+#app { height: 100%; max-width: 440px; margin: 0 auto; display: flex; flex-direction: column; position: relative; user-select: none; -webkit-user-select: none; }
+button { font-family: var(--f-ui); cursor: pointer; border: 0; color: inherit; }
+button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; }
+
+/* HUD */
+.hud { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: var(--ink); border-bottom: 2px solid #000; font-size: 14px; font-weight: 600; }
+.hud .day { color: var(--text); }
+.hud .count { color: var(--gold); font-variant-numeric: tabular-nums; }
+.icon-btn { background: var(--panel); border: 2px solid var(--line); padding: 2px 10px; height: 30px; font-size: 13px; color: var(--muted); }
+
+/* stage */
+.stage { position: relative; width: 100%; aspect-ratio: 180 / 230; max-width: 100%; flex: 0 1 auto; min-height: 0; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+.doc-hit { position: absolute; left: 22.2%; top: 57.4%; width: 50%; height: 35.7%; background: transparent; }
+.doc-label { position: absolute; left: 22.2%; top: 57.4%; width: 50%; height: 5.2%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: clamp(11px, 3.4vw, 15px); pointer-events: none; transition: transform .35s ease-out, opacity .2s; }
+.doc-tap { position: absolute; left: 22.2%; top: 80%; width: 50%; text-align: center; color: var(--paper-ink); font-size: clamp(10px, 2.8vw, 12px); font-weight: 600; pointer-events: none; animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+.stamp-mark { position: absolute; left: 30%; top: 66%; padding: 2px 12px; border: 3px solid currentColor; font-family: var(--f-display); font-size: clamp(18px, 6vw, 26px); transform: rotate(-12deg) scale(1); pointer-events: none; opacity: .9; }
+.stamp-mark.ok { color: #1E7A52; }
+.stamp-mark.no { color: #B02A1E; }
+.stamp-mark.slam { animation: slam .22s cubic-bezier(.2,.9,.3,1.4); }
+@keyframes slam { from { transform: rotate(-12deg) scale(2.2); opacity: 0; } }
+
+/* dialogue */
+.dialog { display: flex; gap: 10px; align-items: center; background: var(--panel); border-top: 2px solid var(--line); border-bottom: 2px solid #000; padding: 8px 12px; min-height: 64px; }
+.portrait { width: 56px; height: 56px; flex: none; image-rendering: pixelated; background: #2A3A33; border: 2px solid #000; }
+.dialog .who { color: var(--gold); font-size: 12px; font-weight: 600; }
+.dialog .line { font-size: 14px; line-height: 1.6; min-height: 1.6em; }
+.dialog > div { min-width: 0; flex: 1; }
+
+/* meter */
+.meter-wrap { padding: 8px 12px 4px; }
+.meter-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.meter { height: 12px; background: #000; border: 2px solid #000; position: relative; }
+.meter i { position: absolute; inset: 0 auto 0 0; width: 0%; background: var(--gold); box-shadow: inset 0 3px 0 #F6C871; transition: width .5s steps(8); }
+.meter.hot i { background: var(--red); box-shadow: inset 0 3px 0 #E06A5C; }
+
+/* envelope bar */
+.env-bar { display: flex; gap: 8px; padding: 6px 12px 0; }
+.env-bar button { flex: 1; padding: 8px; font-size: 13px; font-weight: 600; background: var(--panel-2); border: 2px solid var(--line); }
+.env-bar .take { border-color: #8a6a2a; color: #F2D9A0; }
+
+/* action buttons */
+.actions { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; padding: 10px 12px 12px; margin-top: auto; }
+.btn { font-size: 20px; font-weight: 800; padding: 14px 6px; color: #fff; position: relative; box-shadow: inset 0 -6px 0 rgba(0,0,0,.35), inset 0 3px 0 rgba(255,255,255,.18); }
+.btn:active { transform: translateY(3px); box-shadow: inset 0 -3px 0 rgba(0,0,0,.35); }
+.btn.ok { background: var(--green); }
+.btn.no { background: var(--red); }
+.btn.look { background: var(--panel-2); border: 2px solid var(--line); font-size: 13px; padding: 10px 12px; color: var(--text); }
+.key { display: none; position: absolute; top: 4px; left: 6px; font-size: 10px; font-weight: 600; opacity: .7; font-family: ui-monospace, monospace; }
+@media (hover: hover) and (pointer: fine) { .key { display: inline; } }
+
+/* overlays */
+.overlay { position: absolute; inset: 0; background: rgba(8, 12, 10, .82); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 5; }
+.paper { background: var(--paper); color: var(--paper-ink); width: 100%; max-height: 100%; overflow: auto; box-shadow: 6px 6px 0 #000; font-family: var(--f-doc); }
+.paper-head { color: #fff; padding: 10px 14px; font-family: var(--f-ui); font-weight: 800; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
+.paper-head small { font-weight: 400; font-size: 11px; opacity: .85; }
+.paper-body { padding: 10px 14px 14px; }
+.row { display: flex; justify-content: space-between; gap: 12px; padding: 7px 4px; border-bottom: 1px dashed var(--paper-rule); font-size: 15px; }
+.row b { font-weight: 700; text-align: left; font-variant-numeric: tabular-nums; }
+.row span { color: #6b5e4c; flex: none; }
+.row.flag { background: rgba(192, 57, 43, .14); outline: 2px solid var(--red); }
+.row.tap { cursor: pointer; }
+.row.marked { background: rgba(233, 162, 59, .22); }
+table.items { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px; }
+table.items th, table.items td { border: 1px solid var(--paper-rule); padding: 5px 6px; text-align: right; font-variant-numeric: tabular-nums; }
+table.items th { background: #ece3c8; font-weight: 700; }
+.sig { margin-top: 12px; display: flex; justify-content: space-between; color: #2B3A8C; font-size: 13px; }
+.paper-foot button, .env-bar button { position: relative; }
+.paper-foot { display: flex; gap: 8px; padding: 0 14px 14px; }
+.paper-foot button { flex: 1; padding: 10px; font-weight: 600; font-size: 14px; background: var(--panel); color: var(--text); border: 2px solid #000; }
+.rules ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 8px; font-size: 15px; line-height: 1.7; }
+.rules .note { font-size: 12px; color: #6b5e4c; margin-top: 10px; }
+.rules .people { margin-top: 10px; font-size: 14px; background: #ece3c8; padding: 8px 10px; }
+
+/* feedback */
+.verdict { background: var(--panel); border: 2px solid var(--line); box-shadow: 6px 6px 0 #000; width: 100%; padding: 16px; display: grid; gap: 10px; }
+.verdict h3 { margin: 0; font-family: var(--f-display); font-size: 24px; }
+.verdict.good h3 { color: #5CC08F; }
+.verdict.bad h3 { color: #E06A5C; }
+.verdict p { margin: 0; font-size: 14px; line-height: 1.8; }
+.verdict .env-note { border-top: 1px dashed var(--line); padding-top: 8px; color: #F2D9A0; }
+.verdict button { padding: 12px; font-size: 16px; font-weight: 800; background: var(--gold); color: #1a1208; box-shadow: inset 0 -4px 0 rgba(0,0,0,.3); }
+
+/* start + end */
+.title-screen { align-items: center; justify-content: center; text-align: center; padding: 24px 20px; gap: 14px; background: var(--ink); }
+.logo-stamp { font-family: var(--f-display); font-size: 84px; line-height: 1.1; color: var(--red); border: 6px solid var(--red); padding: 0 26px 8px; transform: rotate(-8deg); margin-bottom: 18px; }
+.title-screen p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.8; max-width: 32ch; }
+.title-screen .start { margin-top: 10px; padding: 14px 40px; font-size: 20px; font-weight: 800; background: var(--green); color: #fff; box-shadow: inset 0 -6px 0 rgba(0,0,0,.35); }
+.controls { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+.credit { position: absolute; bottom: 18px; inset-inline: 0; display: flex; justify-content: center; font-size: 13px; }
+.credit-end { display: flex; justify-content: center; font-size: 13px; padding-block: 6px; }
+.end { padding: 18px 16px; gap: 12px; overflow: auto; background: var(--ink); }
+.end h2 { margin: 0; font-family: var(--f-display); font-size: 30px; text-wrap: balance; }
+.end .rank { font-size: 15px; color: var(--muted); line-height: 1.8; margin: 0; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--panel); border: 2px solid #000; padding: 8px; text-align: center; }
+.stat b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 11px; color: var(--muted); }
+.log { display: grid; gap: 6px; }
+.log div { background: var(--panel); padding: 8px 10px; font-size: 13px; display: flex; justify-content: space-between; gap: 8px; border-inline-start: 4px solid var(--green); }
+.log div.x { border-inline-start-color: var(--red); }
+.end .again { padding: 14px; font-size: 18px; font-weight: 800; background: var(--gold); color: #1a1208; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+@media (max-height: 640px) { .dialog { min-height: 54px; padding: 6px 10px; } .portrait { width: 46px; height: 46px; } .btn { padding: 10px 6px; font-size: 18px; } }
+</style>
+
+</head>
+<body>
+<div id="app" dir="rtl" lang="ar">
+
+  <section class="screen title-screen" id="s-title">
+    <div class="logo-stamp">الختم</div>
+    <p>موظف جديد في إدارة المشتريات. افحص كل معاملة، طابقها مع اللائحة، واختم بالقرار الصحيح.</p>
+    <button class="start" id="btn-start">ابدأ الدوام</button>
+    <div class="controls">
+      <span>الجوال: الأزرار في أسفل الشاشة، والمس الورقة لفحصها</span>
+      <span>الكيبورد: → اعتماد · ← رفض · مسافة فحص · R اللائحة</span>
+    </div>
+    <div class="credit" id="credit-title"></div>
+  </section>
+
+  <section class="screen" id="s-game" hidden>
+    <div class="hud">
+      <span class="day">اليوم الأول</span>
+      <span class="count" id="hud-count">١ / ٧</span>
+      <button class="icon-btn" id="btn-mute" aria-label="كتم الصوت">صوت</button>
+    </div>
+    <div class="stage" id="stage">
+      <canvas id="scene" width="180" height="230"></canvas>
+      <div class="doc-label" id="doc-label">فاتورة توريد</div>
+      <div class="doc-tap" id="doc-tap">المس للفحص</div>
+      <button class="doc-hit" id="doc-hit" aria-label="افحص المعاملة"></button>
+      <div class="stamp-mark" id="stamp-mark" hidden></div>
+    </div>
+    <div class="dialog">
+      <canvas class="portrait" id="portrait" width="28" height="28"></canvas>
+      <div>
+        <div class="who" id="who">المدير</div>
+        <div class="line" id="line"></div>
+      </div>
+    </div>
+    <div class="meter-wrap">
+      <div class="meter-label"><span>مؤشر الشبهة</span><span id="meter-num">٠٪</span></div>
+      <div class="meter" id="meter"><i id="meter-fill"></i></div>
+    </div>
+    <div class="env-bar" id="env-bar" hidden>
+      <button class="return" id="btn-return"><span class="key">Q</span>رُدّ الظرف</button>
+      <button class="take" id="btn-take"><span class="key">E</span>خذ الظرف</button>
+    </div>
+    <div class="actions">
+      <button class="btn ok" id="btn-ok"><span class="key">→</span>معتمد</button>
+      <button class="btn look" id="btn-look"><span class="key">␣</span>افحص</button>
+      <button class="btn no" id="btn-no"><span class="key">←</span>مرفوض</button>
+    </div>
+
+    <div class="overlay" id="ov-doc" hidden>
+      <div class="paper" role="dialog" aria-label="المعاملة">
+        <div class="paper-head" id="doc-head"></div>
+        <div class="paper-body" id="doc-body"></div>
+        <div class="paper-foot">
+          <button id="btn-rules"><span class="key">R</span>اللائحة</button>
+          <button id="btn-close">رجوع للمكتب</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="ov-rules" hidden>
+      <div class="paper rules" role="dialog" aria-label="لائحة الإدارة">
+        <div class="paper-head" style="background:#3E4E8C">لائحة إدارة المشتريات <small>للاستخدام الداخلي</small></div>
+        <div class="paper-body">
+          <ol>
+            <li>يكون السجل التجاري للمورد ساريًا في تاريخ المعاملة.</li>
+            <li>يطابق مبلغ الفاتورة مبلغ أمر الشراء.</li>
+            <li>لا يُتعاقد مع مورد تربطه قرابة بأحد أعضاء لجنة الفحص.</li>
+            <li>حد الشراء المباشر ١٠٠٬٠٠٠ ريال، وما زاد عنه يُطرح في منافسة عامة. تجزئة الشراء للتحايل على هذا الحد مخالفة.</li>
+            <li>أي مال أو هدية من مورد بسبب العمل رشوة.</li>
+          </ol>
+          <div class="people">لجنة الفحص: م. فهد بن سعد الدوسري (رئيسًا)، سلمان القحطاني، نورة الشهري</div>
+          <div class="note">تاريخ اليوم: ٩ ديسمبر ٢٠٢٦ · الحدود والأرقام مبسطة لأغراض اللعبة.</div>
+        </div>
+        <div class="paper-foot"><button id="btn-rules-close">رجوع</button></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="ov-verdict" hidden>
+      <div class="verdict" id="verdict" role="dialog" aria-live="polite">
+        <h3 id="v-title"></h3>
+        <p id="v-text"></p>
+        <p class="env-note" id="v-env" hidden></p>
+        <button id="btn-next"><span class="key" style="position:static;margin-inline-end:6px">Enter</span>المعاملة التالية</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen end" id="s-end" hidden>
+    <h2 id="e-title"></h2>
+    <p class="rank" id="e-text"></p>
+    <div class="stats">
+      <div class="stat"><b id="e-correct"></b><span>قرار صحيح</span></div>
+      <div class="stat"><b id="e-env"></b><span>ظرف مقبول</span></div>
+      <div class="stat"><b id="e-sus"></b><span>الشبهة</span></div>
+    </div>
+    <div class="log" id="e-log"></div>
+    <button class="again" id="btn-again">العب مرة ثانية</button>
+    <div class="credit-end" id="credit-end"></div>
+  </section>
+</div>
+
+<script>
+/* @ds-bundle: {"format":4,"namespace":"Qirtas","components":[{"name":"Splash"},{"name":"Credit"},{"name":"Wordmark"}]} */
+/* قرطاس — شاشة الافتتاح وسطر الحقوق والشعار للألعاب. ملف واحد بلا اعتماديات. */
+(function () {
+  "use strict";
+  var PALETTE = {
+    light: { ground: "#f4ecdc", ink: "#1f1a14", accent: "#a3341f", gilt: "#b8862b", muted: "#6b5d4a" },
+    dark:  { ground: "#191511", ink: "#f1e8d8", accent: "#e8775c", gilt: "#d6a64a", muted: "#b3a48d" }
+  };
+  // Square-kufi wordmark, 31 x 11 cells. Reads right to left.
+  var W = 31, H = 11;
+  var INK = parse("13,0;17,0;13,1;17,1;13,2;17,2;13,3;17,3;26,3;27,3;28,3;29,3;30,3;13,4;15,4;16,4;17,4;18,4;19,4;20,4;26,4;30,4;0,5;6,5;8,5;10,5;13,5;15,5;20,5;26,5;30,5;0,6;6,6;8,6;10,6;13,6;15,6;20,6;26,6;30,6;0,7;4,7;5,7;6,7;7,7;8,7;9,7;10,7;13,7;14,7;15,7;16,7;17,7;18,7;19,7;20,7;23,7;24,7;25,7;26,7;27,7;28,7;29,7;30,7;0,8;4,8;23,8;0,9;1,9;2,9;3,9;4,9;23,9;21,10;22,10;23,10");
+  var DOTS = parse("27,0;29,0");
+  // App mark, 11 x 11: a sheet with a folded corner and the letter qaf cut out of it.
+  var MW = 11;
+  var QAF = parse("3,4;4,4;5,4;6,4;7,4;3,5;7,5;3,6;7,6;3,7;7,7;1,8;2,8;3,8;4,8;5,8;6,8;7,8");
+  var QDOTS = parse("4,2;6,2");
+  var FOLD_CUT = parse("0,0;1,0;0,1");
+  var FOLD = parse("1,1");
+
+  function parse(s) { return s.split(";").map(function (p) { var a = p.split(","); return [+a[0], +a[1]]; }); }
+  function pal(theme) { return PALETTE[theme === "dark" ? "dark" : "light"]; }
+  function has(list, x, y) { for (var i = 0; i < list.length; i++) if (list[i][0] === x && list[i][1] === y) return true; return false; }
+  function path(list, fill) {
+    return '<path fill="' + fill + '" d="' + list.map(function (c) { return "M" + c[0] + " " + c[1] + "h1v1h-1z"; }).join("") + '"/>';
+  }
+  function rects(list, fill, cls) {
+    if (!cls) return path(list, fill);
+    return list.map(function (c) {
+      return '<rect x="' + c[0] + '" y="' + c[1] + '" width="1.1" height="1.1" fill="' + fill + '"' +
+        (cls ? ' class="' + cls + '" data-x="' + c[0] + '" data-y="' + c[1] + '"' : "") + "/>";
+    }).join("");
+  }
+
+  /** Wordmark as an SVG string. opts: {theme, ink, accent, height, title} */
+  function wordmarkSVG(opts) {
+    opts = opts || {}; var p = pal(opts.theme);
+    var ink = opts.ink || p.ink, acc = opts.accent || p.accent;
+    var hgt = opts.height ? ' height="' + opts.height + '" width="' + (opts.height * W / H) + '"' : "";
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + " " + H + '"' + hgt +
+      ' shape-rendering="crispEdges" role="img" aria-label="' + (opts.title || "قرطاس") + '">' +
+      rects(INK, ink, opts._cls) + rects(DOTS, acc, opts._cls ? opts._cls + " qd" : "") + "</svg>";
+  }
+
+  /** Square app mark as an SVG string. opts: {theme, size} */
+  function markSVG(opts) {
+    opts = opts || {}; var p = pal(opts.theme);
+    var cells = [];
+    for (var y = 0; y < MW; y++) for (var x = 0; x < MW; x++)
+      if (!has(QAF, x, y) && !has(QDOTS, x, y) && !has(FOLD_CUT, x, y) && !has(FOLD, x, y)) cells.push([x, y]);
+    var sz = opts.size ? ' width="' + opts.size + '" height="' + opts.size + '"' : "";
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + MW + " " + MW + '"' + sz +
+      ' shape-rendering="crispEdges" role="img" aria-label="قرطاس">' +
+      rects(cells, p.accent) + rects(FOLD, p.gilt) + rects(QDOTS, p.gilt) + "</svg>";
+  }
+
+  /** Draw the wordmark on a 2D canvas (pixel games). unit = pixels per cell. */
+  function drawWordmark(ctx, x, y, unit, opts) {
+    opts = opts || {}; var p = pal(opts.theme); unit = unit || 1;
+    var t = opts.progress == null ? 1 : opts.progress; // 0..1: reveal right to left
+    var cut = W - t * (W + 2);
+    ctx.fillStyle = opts.ink || p.ink;
+    INK.forEach(function (c) { if (c[0] >= cut) ctx.fillRect(x + c[0] * unit, y + c[1] * unit, unit, unit); });
+    if (t >= 1 || opts.progress == null) {
+      ctx.fillStyle = opts.accent || p.accent;
+      DOTS.forEach(function (c) { ctx.fillRect(x + c[0] * unit, y + c[1] * unit, unit, unit); });
+    }
+  }
+
+  /** Draw one frame of the splash on a canvas you own. t = seconds since start. Returns true when finished. */
+  function drawSplash(ctx, w, h, t, opts) {
+    opts = opts || {}; var p = pal(opts.theme);
+    var unit = opts.unit || Math.max(1, Math.floor(Math.min(w * 0.6, 520) / W));
+    var x = Math.round((w - W * unit) / 2), y = Math.round((h - H * unit) / 2);
+    ctx.globalAlpha = 1; ctx.fillStyle = p.ground; ctx.fillRect(0, 0, w, h);
+    drawWordmark(ctx, x, y, unit, { theme: opts.theme, progress: Math.min(1, t / 1.4) });
+    if (t > 1.4) {
+      var lt = Math.min(1, (t - 1.4) / 0.5), lw = Math.round(W * unit * lt);
+      ctx.fillStyle = p.gilt; ctx.fillRect(x + W * unit - lw, y + (H + 2) * unit, lw, Math.max(1, Math.round(unit / 3)));
+    }
+    if (t > 2.6) { ctx.globalAlpha = Math.min(1, (t - 2.6) / 0.4); ctx.fillStyle = "#000"; ctx.fillRect(0, 0, w, h); ctx.globalAlpha = 1; }
+    return t >= 3.0;
+  }
+
+  var cssDone = false;
+  function css() {
+    if (cssDone || typeof document === "undefined") return; cssDone = true;
+    var s = document.createElement("style");
+    s.textContent =
+      ".qirtas-splash{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;transition:opacity .4s}" +
+      ".qirtas-splash.in-box{position:absolute}" +
+      ".qirtas-splash.out{opacity:0}" +
+      ".qirtas-splash svg{display:block;width:min(60%,520px);height:auto;overflow:visible}" +
+      ".qirtas-splash.pixel svg{image-rendering:pixelated}" +
+      ".qirtas-splash .qc{opacity:0;animation:qirtas-in .12s linear forwards}" +
+      ".qirtas-splash .qd{animation-duration:.2s;animation-timing-function:ease-out}" +
+      ".qirtas-splash .ql{height:3px;width:min(60%,520px);margin-top:4%;transform:scaleX(0);transform-origin:right;animation:qirtas-line .5s 1.4s ease-out forwards}" +
+      "@keyframes qirtas-in{to{opacity:1}}@keyframes qirtas-line{to{transform:scaleX(1)}}" +
+      "@media (prefers-reduced-motion:reduce){.qirtas-splash .qc,.qirtas-splash .ql{animation:none;opacity:1;transform:none}}" +
+      ".qirtas-credit{display:inline-flex;align-items:center;gap:.6em;direction:rtl;font:500 14px/1.6 system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif}" +
+      ".qirtas-credit svg{display:block;height:2.2em;width:auto}";
+    document.head.appendChild(s);
+  }
+
+  /** Full-screen opening splash. opts: {theme, pixel, container, hold, onDone}. Returns a Promise. Click, tap or any key skips. */
+  function splash(opts) {
+    opts = opts || {}; css(); var p = pal(opts.theme);
+    var hold = opts.hold == null ? 0.7 : opts.hold;
+    return new Promise(function (resolve) {
+      var el = document.createElement("div");
+      el.className = "qirtas-splash" + (opts.container ? " in-box" : "") + (opts.pixel ? " pixel" : "");
+      el.style.background = p.ground;
+      el.setAttribute("role", "img"); el.setAttribute("aria-label", "قرطاس");
+      el.innerHTML = wordmarkSVG({ theme: opts.theme, _cls: "qc" }) + '<div class="ql" style="background:' + p.gilt + '"></div>';
+      var step = 1.4 / W;
+      Array.prototype.forEach.call(el.querySelectorAll(".qc"), function (r) {
+        var x = +r.getAttribute("data-x"), y = +r.getAttribute("data-y");
+        var d = r.classList.contains("qd") ? 1.45 : (W - 1 - x) * step + y * 0.004;
+        r.style.animationDelay = d.toFixed(3) + "s";
+      });
+      (opts.container || document.body).appendChild(el);
+      var done = false, timer;
+      function finish() {
+        if (done) return; done = true; clearTimeout(timer);
+        el.classList.add("out");
+        removeEventListener("keydown", finish, true);
+        setTimeout(function () { el.remove(); if (opts.onDone) opts.onDone(); resolve(); }, 400);
+      }
+      el.addEventListener("pointerdown", finish);
+      addEventListener("keydown", finish, true);
+      timer = setTimeout(finish, (1.9 + hold) * 1000);
+    });
+  }
+
+  /** "من إنشاء استوديو قرطاس" credit line as an element. opts: {theme, text, color} */
+  function credit(opts) {
+    opts = opts || {}; css(); var p = pal(opts.theme);
+    var el = document.createElement("div");
+    el.className = "qirtas-credit";
+    el.style.color = opts.color || p.ink;
+    el.innerHTML = "<span>" + (opts.text || "من إنشاء استوديو") + "</span>" +
+      wordmarkSVG({ theme: opts.theme, ink: opts.color, title: "قرطاس" });
+    return el;
+  }
+
+  window.Qirtas = {
+    palette: PALETTE, size: { width: W, height: H },
+    splash: splash, credit: credit,
+    wordmarkSVG: wordmarkSVG, markSVG: markSVG,
+    drawWordmark: drawWordmark, drawSplash: drawSplash,
+    Splash: splash, Credit: credit, Wordmark: wordmarkSVG
+  };
+})();
+
+</script>
+<script>
+(() => {
+const $ = (id) => document.getElementById(id);
+const AR = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
+const SAR = (n) => AR(n.toLocaleString("en-US").replace(/,/g, "٬")) + " ريال";
+
+/* ---------- cases ---------- */
+const CASES = [
+  {
+    type: "فاتورة توريد", color: "#1E5E45", no: "INV-4417",
+    fields: [
+      ["المورد", "مؤسسة دار الحبر للقرطاسية"], ["المالك", "خالد بن عمر العتيبي"],
+      ["السجل التجاري", "٢٠٥٠١٢٣٤٥٦"], ["ينتهي السجل", "١٤ مايو ٢٠٢٧", "cr"],
+      ["الصنف", "ورق طباعة وأحبار"], ["مبلغ أمر الشراء", SAR(12400), "po"], ["مبلغ الفاتورة", SAR(12400), "inv"]],
+    flaw: null,
+    manager: "صباح الخير. هذي أول معاملة، طابقها مع اللائحة واختم.",
+    explain: "كل البيانات مطابقة للائحة، واعتمادها هو القرار الصحيح. النزاهة ما تعني رفض كل شي."
+  },
+  {
+    type: "فاتورة توريد", color: "#1E5E45", no: "INV-4430",
+    fields: [
+      ["المورد", "شركة الأفق للتجهيزات المكتبية"], ["المالك", "بدر بن ناصر الحربي"],
+      ["السجل التجاري", "٢٠٥٠٤٤٨٢١٠"], ["ينتهي السجل", "٣ مارس ٢٠٢٨", "cr"],
+      ["الصنف", "٤٠ كرسي مكتبي"], ["مبلغ أمر الشراء", SAR(58000), "po"], ["مبلغ الفاتورة", SAR(85000), "inv"]],
+    flaw: "inv",
+    manager: "مرّرها.. الشركة نعرفها.",
+    explain: "مبلغ الفاتورة أعلى من أمر الشراء بـ ٢٧٬٠٠٠ ريال. اعتمادها يعني صرف مال عام بغير وجه حق."
+  },
+  {
+    type: "فاتورة خدمات", color: "#5B4A2A", no: "SRV-0912",
+    fields: [
+      ["المورد", "مؤسسة الساحل للصيانة"], ["المالك", "عبدالله بن مطلق الشمري"],
+      ["السجل التجاري", "٢٠٥٠٣٣١٩٠٧"], ["ينتهي السجل", "٢ نوفمبر ٢٠٢٦", "cr"],
+      ["الخدمة", "صيانة مكيفات الدور الثاني"], ["مبلغ أمر الشراء", SAR(32500), "po"], ["مبلغ الفاتورة", SAR(32500), "inv"]],
+    flaw: "cr",
+    manager: "الصيانة مستعجلة، المكيفات خربانة والموظفين يشتكون.",
+    explain: "السجل التجاري انتهى في ٢ نوفمبر، قبل تاريخ المعاملة. لا يجوز التعامل مع مورد سجله غير ساري مهما كانت الحاجة مستعجلة."
+  },
+  {
+    type: "عقد توريد", color: "#4A3A7A", no: "CNT-2207",
+    fields: [
+      ["المورد", "شركة الدوسري المتحدة للتقنية"], ["المالك", "ماجد بن فهد بن سعد الدوسري", "owner"],
+      ["السجل التجاري", "٢٠٥٠٧٧٢٥٤٤"], ["ينتهي السجل", "١٩ يناير ٢٠٢٨", "cr"],
+      ["البند", "اشتراك برامج المحاسبة لسنة"], ["مبلغ أمر الشراء", SAR(74000), "po"], ["مبلغ الفاتورة", SAR(74000), "inv"]],
+    flaw: "owner",
+    manager: "ممتازين هذولا، رئيس اللجنة بنفسه رشّحهم.",
+    explain: "المالك ماجد بن فهد بن سعد الدوسري هو ابن رئيس اللجنة فهد بن سعد الدوسري. هذا تعارض مصالح يوجب الرفض، وترشيح الرئيس لهم يزيد الشبهة ولا ينفيها."
+  },
+  {
+    type: "فاتورة طباعة", color: "#1E5E45", no: "PRT-1180",
+    fields: [
+      ["المورد", "مطبعة الشرقية"], ["المالك", "سارة بنت حمد الغامدي"],
+      ["السجل التجاري", "٢٠٥٠٢٢٦٧١٣"], ["ينتهي السجل", "٨ أغسطس ٢٠٢٧", "cr"],
+      ["الصنف", "كتيبات توعية لليوم العالمي لمكافحة الفساد"], ["مبلغ أمر الشراء", SAR(9800), "po"], ["مبلغ الفاتورة", SAR(9800), "inv"]],
+    flaw: null,
+    envelope: { amount: 5000, line: "المندوب: «هذي هدية بسيطة، تقدير لتعاونكم معنا.»" },
+    manager: "مندوب المطبعة ترك لك شي على المكتب.",
+    explain: "المعاملة سليمة وكل بياناتها مطابقة، فاعتمادها صحيح."
+  },
+  {
+    type: "طلب صرف", color: "#2B4A7A", no: "PAY-3301",
+    fields: [
+      ["المورد", "شركة الرقمية لأجهزة الحاسب"], ["المالك", "تركي بن فيصل المطيري"],
+      ["السجل التجاري", "٢٠٥٠٦٦٠٣٢٨"], ["ينتهي السجل", "٢٢ سبتمبر ٢٠٢٨", "cr"],
+      ["الإجمالي المطلوب", SAR(285000), "total"]],
+    table: { head: ["أمر الشراء", "التاريخ", "الصنف", "المبلغ"], rows: [
+      ["٥١٠١", "٣ ديسمبر", "حاسب محمول ×٢٥", SAR(95000)],
+      ["٥١٠٢", "٣ ديسمبر", "حاسب محمول ×٢٥", SAR(95000)],
+      ["٥١٠٣", "٣ ديسمبر", "حاسب محمول ×٢٥", SAR(95000)]] },
+    flaw: "total",
+    envelope: { amount: 20000, line: "المندوب: «عشان المعاملة تمشي بسرعة، ولا من شاف ولا من دري.»" },
+    manager: "الطلبات الثلاث كلها نفس اليوم، اختمها مرة وحدة وخلصنا.",
+    explain: "ثلاث أوامر شراء لنفس الصنف ونفس المورد في يوم واحد، كل واحد تحت حد الشراء المباشر ومجموعها ٢٨٥٬٠٠٠ ريال. هذي تجزئة للتحايل على المنافسة العامة، وهي مخالفة صريحة."
+  },
+  {
+    type: "عقد مشروع", color: "#4A3A7A", no: "CNT-2240",
+    fields: [
+      ["المقاول", "مجموعة البناء الحديث"], ["المالك", "يوسف بن صالح الزهراني"],
+      ["السجل التجاري", "٢٠٥٠١٨٨٤٠٢"], ["ينتهي السجل", "٣٠ يونيو ٢٠٢٨", "cr"],
+      ["المشروع", "ترميم مبنى الأرشيف"], ["طريقة الطرح", "منافسة عامة رقم ٨٨، تقدمت ٥ شركات"],
+      ["مبلغ أمر الشراء", SAR(240000), "po"], ["مبلغ الفاتورة", SAR(240000), "inv"]],
+    flaw: null,
+    manager: "هذا مبلغ كبير.. تأكد منه زين قبل لا تختم.",
+    explain: "المبلغ كبير لكنه طُرح في منافسة عامة وكل البيانات سليمة. رفضه يعطّل مشروعًا عامًا بلا سبب."
+  }
+];
+const ENV_EXPLAIN = "أي مال أو هدية تقبلها من مورد بسبب عملك تُعد رشوة، حتى لو كانت المعاملة نفسها سليمة.";
+
+/* ---------- state ---------- */
+let S;
+function fresh() { return { i: 0, sus: 0, correct: 0, envTaken: 0, envMoney: 0, log: [], decided: false, env: null, looked: false }; }
+
+/* ---------- sound ---------- */
+let AC = null, muted = false;
+try { muted = localStorage.getItem("khatm-muted") === "1"; } catch (e) {}
+function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } return AC; }
+function tone(f, d, type = "square", v = 0.06, delay = 0) {
+  const c = ac(); if (!c || muted) return;
+  const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + delay;
+  o.type = type; o.frequency.value = f; g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t + d);
+}
+function noise(d, v = 0.25, lp = 600) {
+  const c = ac(); if (!c || muted) return;
+  const b = c.createBuffer(1, c.sampleRate * d, c.sampleRate), a = b.getChannelData(0);
+  for (let k = 0; k < a.length; k++) a[k] = (Math.random() * 2 - 1) * (1 - k / a.length);
+  const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+  f.type = "lowpass"; f.frequency.value = lp; g.gain.value = v; s.buffer = b; s.connect(f).connect(g).connect(c.destination); s.start();
+}
+const SFX = {
+  stamp: () => { noise(0.18, 0.5, 380); tone(70, 0.15, "sine", 0.25); },
+  paper: () => noise(0.25, 0.12, 2400),
+  ring: () => { for (let k = 0; k < 2; k++) { tone(880, 0.08, "square", 0.04, k * 0.18); tone(1100, 0.08, "square", 0.04, k * 0.18 + 0.09); } },
+  good: () => { tone(660, 0.1, "square", 0.05); tone(990, 0.16, "square", 0.05, 0.1); },
+  bad: () => { tone(220, 0.18, "sawtooth", 0.05); tone(160, 0.28, "sawtooth", 0.05, 0.16); },
+  coin: () => { tone(1320, 0.06, "square", 0.04); tone(1760, 0.12, "square", 0.04, 0.06); },
+  blip: () => tone(520, 0.03, "square", 0.025)
+};
+
+/* ---------- scene canvas ---------- */
+const cv = $("scene"), cx = cv.getContext("2d");
+const LW = 180, LH = 230;
+let K = 1;
+function fit() {
+  const w = cv.getBoundingClientRect().width || LW;
+  K = Math.max(1, Math.round((w * (window.devicePixelRatio || 1)) / LW));
+  cv.width = LW * K; cv.height = LH * K; cx.imageSmoothingEnabled = false;
+}
+const R = (x, y, w, h, c) => { cx.fillStyle = c; cx.fillRect(Math.round(x) * K, Math.round(y) * K, w * K, h * K); };
+
+const anim = { docX: 160, docTarget: 0, envX: 60, envTarget: 60, stamp: null, t: 0, ring: 0 };
+
+function drawRoom(t) {
+  R(0, 0, LW, 120, "#3F6352");
+  for (let y = 8; y < 100; y += 16) R(0, y, LW, 1, "#2E4A3E");
+  R(0, 100, LW, 20, "#C9BFA3");
+  for (let x = 0; x < LW; x += 10) R(x, 100, 1, 20, "#B3A88A");
+  R(0, 108, LW, 1, "#B3A88A"); R(0, 99, LW, 1, "#8F8466");
+  // window
+  R(108, 14, 56, 50, "#D9CFB4"); R(111, 17, 50, 44, "#7FB3D5"); R(111, 42, 50, 19, "#E7C27D");
+  R(118, 36, 8, 6, "#B9A27A"); R(140, 32, 12, 10, "#B9A27A"); R(145, 22, 6, 6, "#F2D46B");
+  for (let y = 17; y < 40; y += 4) R(111, y, 50, 1, "#C9DCE8");
+  R(135, 17, 2, 44, "#D9CFB4"); R(104, 64, 64, 3, "#B3A88A");
+  // clock (minute hand moves)
+  R(66, 16, 18, 18, "#E8E2D4"); R(67, 17, 16, 16, "#FFFFFF");
+  R(74, 19, 2, 7, "#2A2A2A");
+  const m = Math.floor(t / 2000) % 4; const hands = [[75, 25, 5, 2], [75, 25, 2, 5], [70, 25, 5, 2], [74, 20, 2, 5]];
+  R(...hands[m], "#2A2A2A");
+  // notice board
+  R(12, 14, 42, 34, "#6B4320"); R(14, 16, 38, 30, "#B88A57");
+  R(17, 19, 14, 10, "#F5EFDC"); R(34, 21, 15, 12, "#F2E28A"); R(19, 33, 12, 9, "#F4C7C0");
+  R(23, 19, 2, 2, "#C0392B"); R(41, 21, 2, 2, "#C0392B"); R(25, 33, 2, 2, "#C0392B");
+  R(19, 22, 10, 1, "#D8CDAE"); R(19, 25, 8, 1, "#D8CDAE");
+  // cabinet
+  R(12, 60, 26, 40, "#7D8A86"); R(12, 60, 26, 1, "#9AA7A3");
+  for (const y of [63, 75, 87]) { R(14, y, 22, 10, "#6A7773"); R(22, y + 4, 6, 2, "#C8CFCD"); }
+  // plant
+  R(150, 84, 12, 16, "#9C5B3B"); R(150, 84, 12, 2, "#7A4229");
+  for (const [x, y, w, h] of [[152, 72, 3, 12], [156, 66, 3, 18], [160, 74, 3, 10], [148, 76, 4, 3], [162, 70, 4, 3]]) R(x, y, w, h, "#4E8A3A");
+  // desk
+  R(0, 118, LW, 4, "#6B4320"); R(0, 122, LW, 108, "#8A5A2B");
+  for (const y of [134, 151, 170, 192, 214]) R(0, y, LW, 1, "#6B4320");
+  for (const [x, y, w] of [[20, 140, 30], [90, 160, 40], [130, 200, 30], [40, 182, 26]]) R(x, y, w, 1, "#A0703A");
+  // files stack
+  ["#3E7CB1", "#C08A2E", "#3E7CB1", "#7A5BA8"].forEach((c, i) => R(8, 140 - i * 3, 28, 3, c));
+  R(8, 140, 28, 1, "#000");
+  // phone
+  R(146, 124, 28, 14, "#2B2B2B"); R(148, 126, 24, 4, "#3C3C3C");
+  R(150, 132, 4, 3, "#5A5A5A"); R(156, 132, 4, 3, "#5A5A5A"); R(162, 132, 4, 3, "#5A5A5A");
+  const ringing = anim.ring > t;
+  R(170, 119, 3, 5, ringing && Math.floor(t / 120) % 2 ? "#FF6B5B" : "#7E2A20");
+  // istikana
+  const cxg = 158, gy = 150, widths = [14, 14, 13, 12, 11, 10, 9, 8, 8, 8, 9, 10, 11, 12, 13, 13, 12, 10];
+  widths.forEach((w, i) => {
+    const x0 = cxg - (w >> 1), y = gy + i;
+    if (i === 0) R(x0, y, w, 1, "#E9C46A");
+    else if (i < 3) { R(x0, y, w, 1, "#D6ECF2"); R(x0, y, 1, 1, "#FFFFFF"); R(x0 + w - 1, y, 1, 1, "#A9C7D1"); }
+    else { R(x0, y, w, 1, i === 3 ? "#C2552A" : "#A8431B"); R(x0, y, 1, 1, "#E6F1F5"); R(x0 + w - 1, y, 1, 1, "#C7DDE4"); R(x0 + 2, y, 1, 1, "#D9774A"); }
+  });
+  const sy = gy + widths.length;
+  R(cxg - 13, sy, 26, 2, "#F4F1EA"); R(cxg - 12, sy + 2, 24, 1, "#E9C46A"); R(cxg - 11, sy + 3, 22, 1, "#5a3a1a");
+  // steam (rises and loops)
+  for (let s = 0; s < 3; s++) {
+    const phase = (t / 90 + s * 7) % 14;
+    for (let k = 0; k < 4; k++) {
+      const yy = 147 - ((phase + k * 3) % 14);
+      const xx = 153 + s * 5 + (Math.floor((yy + s) / 2) % 2);
+      if (yy < 148 && yy > 139) R(xx, yy, 1, 1, "#F4F1EA");
+    }
+  }
+  // stamp + ink pad (stamp hidden while animating)
+  R(10, 190, 22, 14, "#4A4A4A"); R(12, 192, 18, 10, "#A23434");
+  if (!anim.stamp) drawStamp(15, 154);
+}
+function drawStamp(x, y) {
+  R(x - 3, y + 22, 18, 4, "#3E2F7A");
+  R(x, y + 6, 12, 16, "#6A4FB3"); R(x, y + 6, 3, 16, "#8E77D6");
+  R(x + 2, y, 8, 6, "#3E2F7A");
+}
+function drawDoc(c) {
+  const ox = anim.docX;
+  if (ox > 150) return;
+  R(42 + ox, 134, 90, 82, "#3a2a1a");
+  R(40 + ox, 132, 90, 82, "#F5EFDC");
+  R(40 + ox, 132, 90, 12, c ? c.color : "#1E5E45");
+  R(40 + ox, 144, 90, 1, "#000");
+  const lines = c && c.table ? [[46, 150, 78], [62, 156, 62], [46, 166, 78], [46, 172, 78], [46, 178, 78], [74, 190, 50]] :
+    [[46, 150, 78], [62, 156, 62], [74, 162, 50], [46, 172, 60], [46, 184, 40], [46, 190, 56]];
+  for (const [x, y, w] of lines) R(x + ox, y, w, 2, "#D8CDAE");
+  for (let i = 0, x = 96; x < 124; x += 2, i++) R(x + ox, 197 + (i % 3), 2, 1, "#2B3A8C");
+}
+function drawEnvelope() {
+  const ox = anim.envX;
+  if (ox > 55) return;
+  R(130 + ox, 182, 40, 26, "#5a4a2a"); R(128 + ox, 180, 40, 26, "#E3D3A4"); R(128 + ox, 180, 40, 1, "#B8A372");
+  for (let i = 0; i < 10; i++) { R(128 + ox + i * 2, 181 + i, 2, 1, "#B8A372"); R(166 + ox - i * 2, 181 + i, 2, 1, "#B8A372"); }
+  R(144 + ox, 191, 8, 6, "#7E2A20"); R(145 + ox, 192, 6, 4, "#C0392B"); R(160 + ox, 176, 6, 4, "#2E9467");
+}
+function frame(now) {
+  anim.t = now;
+  anim.docX += (anim.docTarget - anim.docX) * 0.18; if (Math.abs(anim.docTarget - anim.docX) < 0.5) anim.docX = anim.docTarget;
+  anim.envX += (anim.envTarget - anim.envX) * 0.15; if (Math.abs(anim.envTarget - anim.envX) < 0.5) anim.envX = anim.envTarget;
+  cx.clearRect(0, 0, cv.width, cv.height);
+  drawRoom(now);
+  drawDoc(CASES[S ? S.i : 0]);
+  drawEnvelope();
+  if (anim.stamp) {
+    const p = Math.min(1, (now - anim.stamp.start) / 260);
+    const e = p < 0.7 ? p / 0.7 : 1;
+    const x = 15 + (70 - 15) * e, y = 154 + (150 - 154) * e - Math.sin(e * Math.PI) * 30;
+    drawStamp(x, y);
+    if (p >= 1 && !anim.stamp.hit) { anim.stamp.hit = true; anim.stamp.onHit(); }
+    if (now - anim.stamp.start > 650) anim.stamp = null;
+  }
+  const lbl = $("doc-label");
+  lbl.style.transform = `translateX(${(anim.docX / LW) * 200}%)`;
+  lbl.style.opacity = anim.docX > 140 ? 0 : 1;
+  pollPad();
+  requestAnimationFrame(frame);
+}
+
+/* ---------- portrait ---------- */
+const P = [
+  "........WWWWWWWWWWWW........", "......WWWWWWWWWWWWWWWW......", ".....KKKKKKKKKKKKKKKKKK.....",
+  "....KKKKKKKKKKKKKKKKKKKK....", "....KKKKKKKKKKKKKKKKKKKK....", "...WWWWWWWWWWWWWWWWWWWWWW...",
+  "...WWWWWWWWWWWWWWWWWWWWWW...", "...WWWWSSSSSSSSSSSSSSWWWW...",
+  "..WWWWSSSSSSSSSSSSSSSSWWWW..", "..WWWWSHHHHSSSSSSHHHHSWWWW..", "..WWWWSSSSSSSSSSSSSSSSWWWW..",
+  "..WWWWSSHHSSSSSSSSHHSSWWWW..", "..WWWWSSSSSSSssSSSSSSSWWWW..", "..WWWWSSSSSSsssSSSSSSSWWWW..",
+  "..WWWWsSSSSHHHHHHSSSSsWWWW..", "..WWWWsSSSSSmmmmSSSSSsWWWW..", "..WWWWsHSSSSSHHSSSSSHsWWWW..",
+  "..WWWWsHHSSSHHHHSSSHHsWWWW..", "..WWWWWsHHHHHHHHHHHHsWWWWW..", "..WWWWWWWHHHHHHHHHHWWWWWWW..",
+  "..WWWWWWWWssssssssWWWWWWWW..", ".WWWWWWWWWTTTTTTTTWWWWWWWWW.", ".WWWWWWWWTTTTtTTTTTWWWWWWWW.",
+  "WWWWWWWTTTTTTtTTTTTTTWWWWWWW", "WWWWWTTTTTTTTtTTTTTTTTTWWWWW", "WWWTTTTTTTTTTtTTTTTTTTTTTWWW",
+  "WTTTTTTTTTTTTTTTTTTTTTTTTTTW", "TTTTTTTTTTTTTTTTTTTTTTTTTTTT"];
+const PAL = { K: "#141414", S: "#C68A5A", s: "#A86F44", H: "#1E1A18", m: "#6E3A2A", T: "#FFFFFF", t: "#CFCAC0" };
+function drawPortrait(talk) {
+  const pc = $("portrait").getContext("2d");
+  pc.fillStyle = "#2A3A33"; pc.fillRect(0, 0, 28, 28);
+  P.forEach((row, y) => [...row].forEach((ch, x) => {
+    if (ch === ".") return;
+    let c = ch === "W" ? (((x + y) % 4 === 0 || (x - y + 40) % 4 === 0) ? "#C0392B" : "#F4F1EA") : PAL[ch];
+    if (talk && ch === "m") c = "#3a1a12";
+    pc.fillStyle = c; pc.fillRect(x, y, 1, 1);
+  }));
+  pc.fillStyle = "#3A3A3A"; pc.fillRect(7, 2, 6, 1); pc.fillRect(6, 4, 6, 1);
+  if (talk) { pc.fillStyle = "#3a1a12"; pc.fillRect(12, 16, 4, 1); }
+}
+
+/* ---------- dialogue typewriter ---------- */
+let typeTimer = null, mouth = 0;
+function say(who, text) {
+  $("who").textContent = who; const el = $("line"); el.textContent = "";
+  clearInterval(typeTimer); let k = 0;
+  typeTimer = setInterval(() => {
+    k++; el.textContent = text.slice(0, k);
+    if (who === "المدير") { mouth ^= 1; drawPortrait(mouth); }
+    if (k % 3 === 0) SFX.blip();
+    if (k >= text.length) { clearInterval(typeTimer); drawPortrait(false); }
+  }, 32);
+}
+
+/* ---------- flow ---------- */
+function setMeter() {
+  const v = Math.min(100, S.sus);
+  $("meter-fill").style.width = v + "%"; $("meter-num").textContent = AR(v) + "٪";
+  $("meter").classList.toggle("hot", v >= 60);
+}
+function loadCase() {
+  const c = CASES[S.i];
+  S.decided = false; S.looked = false; S.env = c.envelope ? "pending" : null;
+  $("hud-count").textContent = AR(S.i + 1) + " / " + AR(CASES.length);
+  $("doc-label").textContent = c.type;
+  $("stamp-mark").hidden = true;
+  $("doc-tap").hidden = false;
+  anim.docX = 160; anim.docTarget = 0; SFX.paper();
+  anim.envTarget = 60; anim.envX = 60;
+  $("env-bar").hidden = true;
+  anim.ring = performance.now() + 900; SFX.ring();
+  setTimeout(() => say("المدير", c.manager), 350);
+  if (c.envelope) setTimeout(() => {
+    anim.envTarget = 0; SFX.paper();
+    $("env-bar").hidden = false;
+    say("المندوب", c.envelope.line.replace(/^المندوب: /, ""));
+  }, 2600);
+}
+function openDoc() {
+  if (S.decided) return;
+  const c = CASES[S.i];
+  S.looked = true; $("doc-tap").hidden = true;
+  $("doc-head").style.background = c.color;
+  $("doc-head").innerHTML = `${c.type} <small>رقم <bdi>${c.no}</bdi> · ٩ ديسمبر ٢٠٢٦</small>`;
+  let h = c.fields.map(([k, v, key]) => `<div class="row tap" data-key="${key || ""}"><span>${k}</span><b>${v}</b></div>`).join("");
+  if (c.table) h += `<table class="items"><tr>${c.table.head.map((x) => `<th>${x}</th>`).join("")}</tr>${c.table.rows.map((r) => `<tr>${r.map((x) => `<td>${x}</td>`).join("")}</tr>`).join("")}</table>`;
+  h += `<div class="sig"><span>المحاسب: ع. الخالدي</span><span>توقيع المورد ~~~~</span></div>`;
+  $("doc-body").innerHTML = h;
+  $("doc-body").querySelectorAll(".row").forEach((r) => r.addEventListener("click", () => { r.classList.toggle("marked"); SFX.blip(); }));
+  $("ov-doc").hidden = false; SFX.paper();
+}
+const closeDoc = () => { $("ov-doc").hidden = true; };
+const openRules = () => { $("ov-rules").hidden = false; SFX.paper(); };
+const closeRules = () => { $("ov-rules").hidden = true; };
+function envelope(take) {
+  if (S.env !== "pending" || S.decided) return;
+  const c = CASES[S.i];
+  S.env = take ? "taken" : "returned";
+  $("env-bar").hidden = true;
+  if (take) { S.envTaken++; S.envMoney += c.envelope.amount; S.sus += 30; anim.envTarget = 70; SFX.coin(); say("المندوب", "الله يعطيك العافية.. بيننا."); }
+  else { anim.envTarget = 70; SFX.paper(); say("المندوب", "براحتك.. مثل ما تشوف."); }
+  setMeter();
+}
+function decide(approve) {
+  if (S.decided || anyOverlay()) return;
+  const c = CASES[S.i];
+  if (S.env === "pending") { say("أنت", "لازم أقرر بخصوص الظرف أول."); SFX.bad(); return; }
+  S.decided = true;
+  const right = approve === (c.flaw === null);
+  anim.stamp = { start: performance.now(), hit: false, onHit: () => {
+    SFX.stamp();
+    const m = $("stamp-mark");
+    m.className = "stamp-mark slam " + (approve ? "ok" : "no");
+    m.textContent = approve ? "معتمد" : "مرفوض"; m.hidden = false;
+    const st = $("stage"); st.animate && st.animate([{ transform: "translate(0,0)" }, { transform: "translate(-3px,2px)" }, { transform: "translate(2px,-1px)" }, { transform: "translate(0,0)" }], { duration: 180 });
+    setTimeout(() => showVerdict(c, approve, right), 520);
+  } };
+  if (right) S.correct++;
+  else S.sus += approve ? 25 : 8;
+  S.log.push({ type: c.type, supplier: c.fields[0][1], right, approve, env: S.env });
+  setMeter();
+}
+function showVerdict(c, approve, right) {
+  const v = $("verdict");
+  v.className = "verdict " + (right ? "good" : "bad");
+  $("v-title").textContent = right ? (approve ? "اعتماد صحيح" : "رفض صحيح") : (approve ? "اعتمدت معاملة مخالفة" : "رفضت معاملة سليمة");
+  $("v-text").textContent = c.explain;
+  const en = $("v-env");
+  if (c.envelope) {
+    en.hidden = false;
+    en.textContent = S.env === "taken" ? `أخذت ظرفًا فيه ${SAR(c.envelope.amount)}. ${ENV_EXPLAIN}` : `رددت الظرف، وهذا هو التصرف الصحيح. ${ENV_EXPLAIN}`;
+  } else en.hidden = true;
+  right && S.env !== "taken" ? SFX.good() : SFX.bad();
+  $("ov-verdict").hidden = false;
+  $("btn-next").textContent = S.i + 1 < CASES.length && S.sus < 100 ? "المعاملة التالية" : "نهاية الدوام";
+  $("btn-next").focus({ preventScroll: true });
+}
+function next() {
+  $("ov-verdict").hidden = true;
+  $("stamp-mark").hidden = true;
+  anim.docTarget = -170; SFX.paper();
+  if (S.sus >= 100 || S.i + 1 >= CASES.length) { setTimeout(showEnd, 350); return; }
+  S.i++;
+  setTimeout(loadCase, 380);
+}
+function showEnd() {
+  $("s-game").hidden = true; $("s-end").hidden = false;
+  const n = CASES.length, caught = S.sus >= 100;
+  let title, text;
+  if (caught) { title = "أُحيلت ملفاتك للتحقيق"; text = "مؤشر الشبهة وصل حده قبل نهاية الدوام. المعاملات اللي مرّرتها والظروف اللي قبلتها صارت في ملف واحد."; }
+  else if (S.envTaken > 0) { title = "متورط"; text = `قراراتك على الورق ${AR(S.correct)} من ${AR(n)}، لكنك قبلت ${SAR(S.envMoney)} من موردين. الرشوة جريمة مستقلة حتى لو كانت المعاملة سليمة.`; }
+  else if (S.correct === n) { title = "موظف نزيه"; text = "فحصت كل معاملة بدقة، ورفضت الضغط والهدايا. هذا الختم اللي يحمي المال العام."; }
+  else if (S.correct >= n - 2) { title = "نزيه.. وقريب من الكمال"; text = "ما أخذت شي، لكن فاتتك معاملات تستاهل نظرة ثانية. ارجع للائحة وجرب مرة ثانية."; }
+  else { title = "متساهل"; text = "ما قبلت رشوة، لكن مرّت من تحت ختمك مخالفات كثيرة. التساهل باب يدخل منه الفساد."; }
+  $("e-title").textContent = title; $("e-text").textContent = text;
+  $("e-correct").textContent = AR(S.correct) + "/" + AR(n);
+  $("e-env").textContent = AR(S.envTaken);
+  $("e-sus").textContent = AR(Math.min(100, S.sus)) + "٪";
+  $("e-log").innerHTML = S.log.map((l) => `<div class="${l.right && l.env !== "taken" ? "" : "x"}"><span>${l.supplier}</span><span>${l.approve ? "معتمد" : "مرفوض"}${l.right ? "" : " ✗"}${l.env === "taken" ? " · ظرف" : ""}</span></div>`).join("");
+  (S.envTaken === 0 && !caught && S.correct >= n - 2) ? SFX.good() : SFX.bad();
+}
+function start() {
+  ac(); if (AC && AC.state === "suspended") AC.resume();
+  S = fresh(); setMeter();
+  $("s-title").hidden = true; $("s-end").hidden = true; $("s-game").hidden = false;
+  fit(); drawPortrait(false);
+  loadCase();
+}
+const anyOverlay = () => !$("ov-doc").hidden || !$("ov-rules").hidden || !$("ov-verdict").hidden;
+
+/* ---------- input ---------- */
+$("btn-start").onclick = start;
+$("btn-again").onclick = start;
+$("btn-ok").onclick = () => decide(true);
+$("btn-no").onclick = () => decide(false);
+$("btn-look").onclick = openDoc;
+$("doc-hit").onclick = openDoc;
+$("btn-close").onclick = closeDoc;
+$("btn-rules").onclick = openRules;
+$("btn-rules-close").onclick = closeRules;
+$("btn-next").onclick = next;
+$("btn-return").onclick = () => envelope(false);
+$("btn-take").onclick = () => envelope(true);
+$("btn-mute").onclick = () => { muted = !muted; $("btn-mute").textContent = muted ? "صامت" : "صوت"; try { localStorage.setItem("khatm-muted", muted ? "1" : "0"); } catch (e) {} };
+$("btn-mute").textContent = muted ? "صامت" : "صوت";
+
+function key(k) {
+  if (document.querySelector(".qirtas-splash")) return;
+  if (!$("s-title").hidden) { if (k === "Enter" || k === " ") start(); return; }
+  if (!$("s-end").hidden) { if (k === "Enter") start(); return; }
+  if (!$("ov-verdict").hidden) { if (k === "Enter" || k === " ") next(); return; }
+  if (!$("ov-rules").hidden) { if (k === "Escape" || k === "r" || k === "R" || k === " ") closeRules(); return; }
+  if (!$("ov-doc").hidden) {
+    if (k === "r" || k === "R") openRules();
+    else if (k === "Escape" || k === " ") closeDoc();
+    return;
+  }
+  if (k === "ArrowRight" || k === "d" || k === "D") decide(true);
+  else if (k === "ArrowLeft" || k === "a" || k === "A") decide(false);
+  else if (k === " " || k === "f" || k === "F") openDoc();
+  else if (k === "r" || k === "R") openRules();
+  else if (k === "q" || k === "Q") envelope(false);
+  else if (k === "e" || k === "E") envelope(true);
+}
+document.addEventListener("keydown", (e) => {
+  if (["ArrowLeft", "ArrowRight", " ", "Enter"].includes(e.key)) e.preventDefault();
+  key(e.key);
+});
+
+/* gamepad: A approve, B reject, X inspect, Y rules, LB return envelope, RB take, Start next */
+let padPrev = [];
+function pollPad() {
+  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+  const p = pads && [...pads].find(Boolean); if (!p) return;
+  const map = { 0: "Enter", 1: "Escape", 2: " ", 3: "R", 4: "Q", 5: "E", 9: "Enter", 14: "ArrowLeft", 15: "ArrowRight" };
+  p.buttons.forEach((b, i) => {
+    if (b.pressed && !padPrev[i]) {
+      if (i === 0) { $("ov-doc").hidden && $("ov-rules").hidden && $("ov-verdict").hidden && $("s-game").hidden === false ? decide(true) : key("Enter"); }
+      else if (i === 1) { anyOverlay() ? key("Escape") : decide(false); }
+      else if (map[i]) key(map[i]);
+    }
+    padPrev[i] = b.pressed;
+  });
+}
+
+window.addEventListener("resize", fit);
+if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+fit(); drawPortrait(false);
+S = fresh();
+requestAnimationFrame(frame);
+if (window.Qirtas) {
+  $("credit-title").appendChild(Qirtas.credit({ theme: "dark" }));
+  $("credit-end").appendChild(Qirtas.credit({ theme: "dark" }));
+  Qirtas.splash({ theme: "dark", pixel: true, container: $("app") });
+}
+})();
+</script>
+
+</body>
+</html>
