@@ -130,7 +130,14 @@ table.items th { background: #ece3c8; font-weight: 700; }
 .sheet { display: flex; flex-direction: column; overflow: hidden; max-height: 100%; }
 .sheet .paper-head { flex: none; }
 .sheet .x { background: rgba(0,0,0,.25); color: #fff; width: 32px; height: 32px; font-size: 16px; flex: none; }
-.sheet .scroll { flex: 1; overflow: auto; min-height: 0; -webkit-overflow-scrolling: touch; }
+.sheet .scroll { flex: 1; overflow: auto; min-height: 0; -webkit-overflow-scrolling: touch; scrollbar-width: auto; scrollbar-color: #8a6a2a #e6dcc0; }
+.sheet .scroll::-webkit-scrollbar { width: 10px; }
+.sheet .scroll::-webkit-scrollbar-track { background: #e6dcc0; }
+.sheet .scroll::-webkit-scrollbar-thumb { background: #8a6a2a; border: 2px solid #e6dcc0; }
+.more { position: sticky; bottom: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 26px 10px 10px; margin-top: -40px; border: 0; background: linear-gradient(rgba(245,239,220,0), var(--paper) 55%); color: #3E4E8C; font-family: var(--f-ui); font-weight: 700; font-size: 14px; cursor: pointer; transition: opacity .25s; }
+.more i { font-style: normal; display: inline-grid; place-items: center; width: 26px; height: 26px; background: #3E4E8C; color: #fff; animation: nudge 1s ease-in-out infinite; }
+.more.gone { opacity: 0; pointer-events: none; }
+@keyframes nudge { 50% { transform: translateY(4px); } }
 .mgr { margin: 10px 14px 0; padding: 8px 10px; background: #2A3A33; color: var(--text); font-family: var(--f-ui); font-size: 13px; line-height: 1.7; }
 .mgr span { color: var(--gold); font-weight: 600; }
 .mgr q { quotes: "«" "»"; }
@@ -268,6 +275,7 @@ table.items th { background: #ece3c8; font-weight: 700; }
           </div>
           <div class="note">تاريخ اليوم: ٩ ديسمبر ٢٠٢٦ · الأسماء والمبالغ افتراضية، والقواعد مختصرة من الأنظمة السعودية.</div>
           </section>
+          <button class="more" id="doc-more" type="button">اسحب لتحت، تكملة اللائحة <i>↓</i></button>
         </div>
         <div class="decide">
           <button class="btn ok" id="d-ok"><span class="key">→</span>معتمد</button>
@@ -814,6 +822,7 @@ function openDoc() {
   $("doc-mgr").textContent = c.manager;
   renderEnv();
   $("doc-scroll").scrollTop = 0;
+  requestAnimationFrame(moreHint);
   let h = c.fields.map(([k, v, key]) => `<div class="row tap" data-key="${key || ""}"><span>${k}</span><b>${v}</b></div>`).join("");
   if (c.table) h += `<table class="items"><tr>${c.table.head.map((x) => `<th>${x}</th>`).join("")}</tr>${c.table.rows.map((r) => `<tr>${r.map((x) => `<td>${x}</td>`).join("")}</tr>`).join("")}</table>`;
   h += `<div class="sig"><span>المحاسب: ع. الخالدي</span><span>توقيع المورد ~~~~</span></div>`;
@@ -823,6 +832,11 @@ function openDoc() {
 }
 const closeDoc = () => { $("ov-doc").hidden = true; };
 const openRules = () => { if ($("ov-doc").hidden) openDoc(); $("rules-inline").scrollIntoView({ behavior: "smooth", block: "start" }); };
+function moreHint() {
+  const sc = $("doc-scroll");
+  const left = sc.scrollHeight - sc.clientHeight - sc.scrollTop;
+  $("doc-more").classList.toggle("gone", left < 40 || sc.scrollTop > 120);
+}
 function renderEnv() {
   const c = CASES[S.i], box = $("doc-env");
   box.hidden = !c.envelope;
@@ -924,6 +938,8 @@ $("btn-no").onclick = () => decide(false);
 $("btn-look").onclick = openDoc;
 $("doc-hit").onclick = openDoc;
 $("btn-close").onclick = closeDoc;
+$("doc-scroll").addEventListener("scroll", moreHint, { passive: true });
+$("doc-more").onclick = () => $("doc-scroll").scrollBy({ top: $("doc-scroll").clientHeight * 0.8, behavior: "smooth" });
 $("d-ok").onclick = () => decide(true);
 $("d-no").onclick = () => decide(false);
 $("d-return").onclick = () => envelope(false);
