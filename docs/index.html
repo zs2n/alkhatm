@@ -797,8 +797,13 @@ function loadCase() {
   $("env-bar").hidden = true;
   anim.ring = performance.now() + 900; SFX.ring();
   setTimeout(() => say("المدير", c.manager), 350);
-  if (c.envelope) setTimeout(() => { anim.envTarget = 0; SFX.paper(); }, 600);
-  setTimeout(() => { if (S.cases === CASES && CASES[S.i] === c && !S.decided) openDoc(); }, 1300);
+  const wide = window.matchMedia("(min-width: 880px) and (min-height: 560px)").matches;
+  if (c.envelope) setTimeout(() => {
+    if (S.cases !== CASES || CASES[S.i] !== c) return;
+    anim.envTarget = 0; SFX.paper();
+    if (S.env === "pending") say("المندوب", c.envelope.line);
+  }, wide ? 600 : 2600);
+  if (wide) setTimeout(() => { if (S.cases === CASES && CASES[S.i] === c && !S.decided) openDoc(); }, 1300);
 }
 function openDoc() {
   if (S.decided) return;

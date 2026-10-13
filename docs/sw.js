@@ -1,5 +1,5 @@
 /* الختم — service worker: يحفظ ملفات اللعبة عشان تفتح بسرعة وتشتغل بدون نت بعد أول فتح. */
-const VERSION = "alkhatm-v5";
+const VERSION = "alkhatm-v6";
 const SHELL = ["./", "index.html", "manifest.webmanifest",
   "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png"];
 
