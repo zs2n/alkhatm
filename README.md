@@ -6,7 +6,7 @@
 
 - العب: https://zs2n.github.io/alkhatm/
 - اللعبة كلها في `docs/` كموقع يشتغل من الجوال مباشرة، ويقدر اللاعب يضيفه للشاشة الرئيسية.
-- `poster-alkhatm.png` ملصق الفعالية بالباركود، و`qr-alkhatm.png` الباركود لحاله.
+- `poster-alkhatm.png` ملصق الفعالية بالباركود، و`display-alkhatm.png` صورة شاشة العرض (1920×1080)، و`qr-alkhatm.png` الباركود لحاله.
 
 ## التحكم
 
