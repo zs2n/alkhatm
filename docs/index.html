@@ -173,7 +173,9 @@ table.items th { background: #ece3c8; font-weight: 700; }
 .title-screen p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.8; max-width: 32ch; }
 .title-screen .start { margin-top: 10px; padding: 14px 40px; font-size: 20px; font-weight: 800; background: var(--green); color: #fff; box-shadow: inset 0 -6px 0 rgba(0,0,0,.35); }
 .controls { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
-.credit { position: absolute; bottom: 18px; inset-inline: 0; display: flex; justify-content: center; font-size: 13px; }
+.credit { position: absolute; bottom: 18px; inset-inline: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; }
+.collab { font-size: 13px; color: #b3a48d; }
+.collab b { color: #f1e8d8; font-weight: 700; }
 .credit-end { display: flex; justify-content: center; font-size: 13px; padding-block: 6px; }
 .end { padding: 18px 16px; gap: 12px; overflow: auto; background: var(--ink); }
 .end h2 { margin: 0; font-family: var(--f-display); font-size: 30px; text-wrap: balance; }
@@ -188,6 +190,31 @@ table.items th { background: #ece3c8; font-weight: 700; }
 .report { display: grid; gap: 2px; text-align: center; background: var(--panel-2); border: 2px solid var(--gold); padding: 12px; font-size: 14px; line-height: 1.8; }
 .report b { color: var(--gold); font-size: 16px; }
 .report bdi { font-weight: 600; letter-spacing: .03em; user-select: text; -webkit-user-select: text; }
+.end2 { padding: 22px 18px 16px; gap: 18px; overflow: auto; background: var(--ink); align-items: stretch; }
+.e-head { text-align: center; display: grid; gap: 6px; justify-items: center; }
+.e-kicker { font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+.e-head h2 { margin: 0; font-family: var(--f-display); font-size: 34px; line-height: 1.2; }
+.e-head p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.8; max-width: 34ch; }
+.e-track { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.e-track > span { font-size: 11px; color: var(--muted); writing-mode: horizontal-tb; width: 34px; line-height: 1.3; }
+.e-marks { display: flex; gap: 5px; }
+.mk { display: grid; justify-items: center; gap: 2px; }
+.mk small { font-size: 11px; color: var(--muted); font-family: ui-monospace, monospace; }
+.e-marks i { width: 30px; height: 30px; display: grid; place-items: center; font-style: normal; font-weight: 800; font-size: 14px; color: #fff; border: 2px solid #000; }
+.e-marks i.ok { background: var(--green); } .e-marks i.no { background: var(--red); }
+.e-sum { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.e-sum span { color: var(--text); font-weight: 700; }
+.e-quotes { text-align: center; display: grid; gap: 14px; justify-items: center; padding-block: 6px; }
+.e-quotes blockquote { margin: 0; display: grid; gap: 6px; }
+.e-quotes p { margin: 0; font-family: var(--f-doc); text-wrap: balance; line-height: 1.7; }
+.e-quotes cite { font-style: normal; font-size: 12px; color: var(--muted); }
+.q1 p { font-size: 30px; font-weight: 700; color: #F2D9A0; }
+.q2 p { font-size: 17px; color: var(--text); max-width: 30ch; }
+.e-rule { width: 48px; height: 3px; background: var(--gold); display: block; }
+.end2 .again { padding: 14px; font-size: 18px; font-weight: 800; background: var(--gold); color: #1a1208; }
+.e-foot { display: grid; gap: 8px; justify-items: center; text-align: center; padding-top: 4px; border-top: 1px solid #24332C; }
+.e-report { margin: 8px 0 0; font-size: 12px; color: var(--muted); line-height: 1.7; }
+.e-report bdi { color: var(--gold); font-weight: 700; }
 .end .again { padding: 14px; font-size: 18px; font-weight: 800; background: var(--gold); color: #1a1208; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 @media (max-height: 640px) { .dialog { min-height: 54px; padding: 6px 10px; } .portrait { width: 46px; height: 46px; } .btn { padding: 10px 6px; font-size: 18px; } }
@@ -196,6 +223,11 @@ table.items th { background: #ece3c8; font-weight: 700; }
 </head>
 <body>
 <div id="app" dir="rtl" lang="ar">
+<div id="collab-card" hidden style="position:absolute;inset:0;z-index:99;background:#191511;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;direction:rtl;font-family:'Noto Kufi Arabic',Tahoma,sans-serif">
+  <div style="color:#b3a48d;font-size:18px;letter-spacing:.02em">بالتعاون مع</div>
+  <div style="color:#f1e8d8;font-size:44px;font-weight:800;line-height:1.2">نادي نزاهة</div>
+  <div style="width:180px;height:3px;background:#d6a64a"></div>
+</div>
 
   <section class="screen title-screen" id="s-title">
     <div class="logo-stamp">الختم</div>
@@ -212,7 +244,7 @@ table.items th { background: #ece3c8; font-weight: 700; }
    <div class="desk-col">
     <div class="hud">
       <span class="day">اليوم الأول</span>
-      <span class="count" id="hud-count">١ / ٧</span>
+      <span class="count" id="hud-count">1 / 7</span>
       <button class="icon-btn" id="btn-mute" aria-label="كتم الصوت">صوت</button>
     </div>
     <div class="stage" id="stage">
@@ -230,7 +262,7 @@ table.items th { background: #ece3c8; font-weight: 700; }
       </div>
     </div>
     <div class="meter-wrap">
-      <div class="meter-label"><span>مؤشر الشبهة</span><span id="meter-num">٠٪</span></div>
+      <div class="meter-label"><span>مؤشر الشبهة</span><span id="meter-num" dir="ltr">0%</span></div>
       <div class="meter" id="meter"><i id="meter-fill"></i></div>
     </div>
     <div class="env-bar" id="env-bar" hidden>
@@ -273,7 +305,7 @@ table.items th { background: #ece3c8; font-weight: 700; }
             <div class="pp"><span>سلمان بن علي القحطاني (عضو)</span><span>يملك: مؤسسة القحطاني للحلول الإدارية</span></div>
             <div class="pp"><span>نورة بنت محمد الشهري (عضو)</span><span>لا يوجد</span></div>
           </div>
-          <div class="note">تاريخ اليوم: ٩ ديسمبر ٢٠٢٦ · الأسماء والمبالغ افتراضية، والقواعد مختصرة من الأنظمة السعودية.</div>
+          <div class="note">تاريخ اليوم: 9 ديسمبر 2026 · الأسماء والمبالغ افتراضية، والقواعد مختصرة من الأنظمة السعودية.</div>
           </section>
           <button class="more" id="doc-more" type="button">اسحب لتحت، تكملة اللائحة <i>↓</i></button>
         </div>
@@ -295,22 +327,25 @@ table.items th { background: #ece3c8; font-weight: 700; }
     </div>
   </section>
 
-  <section class="screen end" id="s-end" hidden>
-    <h2 id="e-title"></h2>
-    <p class="rank" id="e-text"></p>
-    <div class="stats">
-      <div class="stat"><b id="e-correct"></b><span>قرار صحيح</span></div>
-      <div class="stat"><b id="e-env"></b><span>ظرف مقبول</span></div>
-      <div class="stat"><b id="e-sus"></b><span>الشبهة</span></div>
-    </div>
-    <div class="log" id="e-log"></div>
-    <div class="report">
-      <b>شفت فساد؟ بلّغ «نزاهة»</b>
-      <span>الرقم المجاني <bdi dir="ltr">980</bdi> · واتساب <bdi dir="ltr">0539980980</bdi></span>
-      <span><bdi dir="ltr">980@nazaha.gov.sa</bdi></span>
+  <section class="screen end2" id="s-end" hidden>
+    <header class="e-head">
+      <span class="e-kicker">تقرير نهاية الدوام</span>
+      <h2 id="e-title"></h2>
+      <p id="e-text"></p>
+      <div class="e-track"><div class="e-marks" id="e-log"></div></div>
+      <div class="e-sum">قرار صحيح: <span id="e-correct"></span> · ظرف مقبول: <span id="e-env"></span> · الشبهة: <bdi dir="ltr"><span id="e-sus"></span></bdi></div>
+    </header>
+    <div class="e-quotes">
+      <blockquote class="q1"><p>«مَن غَشَّنا فليس مِنّا»</p><cite>رسول الله ﷺ</cite></blockquote>
+      <i class="e-rule"></i>
+      <blockquote class="q2"><p>«لن ينجو أي شخص دخل في قضية فساد، أيًّا من كان، سواء كان وزيرًا أو أميرًا»</p><cite>الأمير محمد بن سلمان، ولي العهد</cite></blockquote>
     </div>
     <button class="again" id="btn-again">العب مرة ثانية</button>
-    <div class="credit-end" id="credit-end"></div>
+    <footer class="e-foot">
+      <p class="e-report">للإبلاغ عن الفساد: هيئة الرقابة ومكافحة الفساد «نزاهة» · <bdi dir="ltr">980</bdi></p>
+      <div id="credit-end"></div>
+      <div class="collab">بالتعاون مع <b>نادي نزاهة</b></div>
+    </footer>
   </section>
 </div>
 
@@ -472,110 +507,110 @@ table.items th { background: #ece3c8; font-weight: 700; }
 <script>
 (() => {
 const $ = (id) => document.getElementById(id);
-const AR = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
-const SAR = (n) => AR(n.toLocaleString("en-US").replace(/,/g, "٬")) + " ريال";
+const AR = (n) => String(n);
+const SAR = (n) => n.toLocaleString("en-US") + " ريال";
 
 /* ---------- cases ---------- */
 /* ---------- case pool: each round draws 7 (first is always an easy clean one) ---------- */
 const L = {
-  license: "نظام المنافسات والمشتريات الحكومية، المادة ٣: تتعامل الجهات الحكومية مع المرخّص لهم نظامًا فقط.",
-  split: "نظام المنافسات والمشتريات الحكومية، المادة ٢٧: لا تجوز تجزئة الأعمال والمشتريات للوصول بها إلى صلاحية الشراء المباشر.",
-  direct: "نظام المنافسات والمشتريات الحكومية، المادة ٣٢ (٣): الشراء المباشر جائز إذا لم تتجاوز التكلفة مليون ريال.",
-  conflict: "لائحة تعارض المصالح في تطبيق نظام المنافسات، المادة ٥: يُفصح الموظف كتابةً عن تعارض المصالح ويمتنع عن المشاركة في القرار. والقرابة تشمل حتى الدرجة الرابعة.",
+  license: "نظام المنافسات والمشتريات الحكومية، المادة 3: تتعامل الجهات الحكومية مع المرخّص لهم نظامًا فقط.",
+  split: "نظام المنافسات والمشتريات الحكومية، المادة 27: لا تجوز تجزئة الأعمال والمشتريات للوصول بها إلى صلاحية الشراء المباشر.",
+  direct: "نظام المنافسات والمشتريات الحكومية، المادة 32 (3): الشراء المباشر جائز إذا لم تتجاوز التكلفة مليون ريال.",
+  conflict: "لائحة تعارض المصالح في تطبيق نظام المنافسات، المادة 5: يُفصح الموظف كتابةً عن تعارض المصالح ويمتنع عن المشاركة في القرار. والقرابة تشمل حتى الدرجة الرابعة.",
   bribe: "نظام مكافحة الرشوة، المادة الأولى: يُعد مرتشيًا كل موظف عام طلب أو قبل أو أخذ وعدًا أو عطية لأداء عمل من أعمال وظيفته."
 };
 const REC = (d) => ["محضر الاستلام", d, "rec"];
 const POOL = [
   /* ---- clean ---- */
   { id: "c1", clean: true, intro: true, type: "فاتورة توريد", color: "#1E5E45", no: "INV-4417",
-    fields: [["المورد", "مؤسسة دار الحبر للقرطاسية"], ["المالك", "خالد بن عمر العتيبي"], ["السجل التجاري", "٢٠٥٠١٢٣٤٥٦"], ["ينتهي السجل", "١٤ مايو ٢٠٢٧", "cr"],
-      ["الصنف", "ورق طباعة وأحبار"], REC("تم الاستلام ٧ ديسمبر"), ["مبلغ أمر الشراء", SAR(12400), "po"], ["مبلغ الفاتورة", SAR(12400), "inv"]],
+    fields: [["المورد", "مؤسسة دار الحبر للقرطاسية"], ["المالك", "خالد بن عمر العتيبي"], ["السجل التجاري", "2050123456"], ["ينتهي السجل", "14 مايو 2027", "cr"],
+      ["الصنف", "ورق طباعة وأحبار"], REC("تم الاستلام 7 ديسمبر"), ["مبلغ أمر الشراء", SAR(12400), "po"], ["مبلغ الفاتورة", SAR(12400), "inv"]],
     manager: "صباح الخير. ورق وأحبار، معاملة بسيطة.",
     explain: "كل البيانات مطابقة للائحة، واعتمادها هو القرار الصحيح. النزاهة ما تعني رفض كل شي." },
   { id: "c2", clean: true, intro: true, type: "فاتورة خدمات", color: "#5B4A2A", no: "SRV-0870",
-    fields: [["المورد", "مؤسسة النقاء لخدمات النظافة"], ["المالك", "منيرة بنت سعود الهاجري"], ["السجل التجاري", "٢٠٥٠٥٥١٢٠٩"], ["ينتهي السجل", "١ فبراير ٢٠٢٨", "cr"],
-      ["الخدمة", "نظافة المبنى لشهر نوفمبر"], REC("تم الاستلام ٣٠ نوفمبر"), ["مبلغ أمر الشراء", SAR(18500), "po"], ["مبلغ الفاتورة", SAR(18500), "inv"]],
+    fields: [["المورد", "مؤسسة النقاء لخدمات النظافة"], ["المالك", "منيرة بنت سعود الهاجري"], ["السجل التجاري", "2050551209"], ["ينتهي السجل", "1 فبراير 2028", "cr"],
+      ["الخدمة", "نظافة المبنى لشهر نوفمبر"], REC("تم الاستلام 30 نوفمبر"), ["مبلغ أمر الشراء", SAR(18500), "po"], ["مبلغ الفاتورة", SAR(18500), "inv"]],
     manager: "فاتورة النظافة الشهرية، نفس كل شهر.",
     explain: "الخدمة نُفذت واستُلمت، والسجل ساري، والمبلغ مطابق. اعتمادها صحيح." },
   { id: "c3", clean: true, intro: true, type: "فاتورة توريد", color: "#1E5E45", no: "INV-4452",
-    fields: [["المورد", "شركة الإمداد للضيافة"], ["المالك", "عبدالرحمن بن ناصر السبيعي"], ["السجل التجاري", "٢٠٥٠٨٧٣٣١٤"], ["ينتهي السجل", "٢٠ أكتوبر ٢٠٢٧", "cr"],
-      ["الصنف", "مياه وقهوة للمكاتب"], REC("تم الاستلام ٨ ديسمبر"), ["مبلغ أمر الشراء", SAR(6250), "po"], ["مبلغ الفاتورة", SAR(6250), "inv"]],
+    fields: [["المورد", "شركة الإمداد للضيافة"], ["المالك", "عبدالرحمن بن ناصر السبيعي"], ["السجل التجاري", "2050873314"], ["ينتهي السجل", "20 أكتوبر 2027", "cr"],
+      ["الصنف", "مياه وقهوة للمكاتب"], REC("تم الاستلام 8 ديسمبر"), ["مبلغ أمر الشراء", SAR(6250), "po"], ["مبلغ الفاتورة", SAR(6250), "inv"]],
     manager: "القهوة خلصت من أمس، الله يعينك.",
     explain: "معاملة سليمة من أولها لآخرها، فاعتمادها هو القرار الصحيح." },
   { id: "c4", clean: true, type: "فاتورة طباعة", color: "#1E5E45", no: "PRT-1180",
-    fields: [["المورد", "مطبعة الشرقية"], ["المالك", "سارة بنت حمد الغامدي"], ["السجل التجاري", "٢٠٥٠٢٢٦٧١٣"], ["ينتهي السجل", "٨ أغسطس ٢٠٢٧", "cr"],
-      ["الصنف", "كتيبات توعية لليوم العالمي لمكافحة الفساد"], REC("تم الاستلام ٦ ديسمبر"), ["مبلغ أمر الشراء", SAR(9800), "po"], ["مبلغ الفاتورة", SAR(9800), "inv"]],
+    fields: [["المورد", "مطبعة الشرقية"], ["المالك", "سارة بنت حمد الغامدي"], ["السجل التجاري", "2050226713"], ["ينتهي السجل", "8 أغسطس 2027", "cr"],
+      ["الصنف", "كتيبات توعية لليوم العالمي لمكافحة الفساد"], REC("تم الاستلام 6 ديسمبر"), ["مبلغ أمر الشراء", SAR(9800), "po"], ["مبلغ الفاتورة", SAR(9800), "inv"]],
     envelope: { amount: 5000, line: "هذي هدية بسيطة، تقدير لتعاونكم معنا." },
     manager: "مندوب المطبعة ترك لك شي على المكتب.",
     explain: "المعاملة سليمة وكل بياناتها مطابقة، فاعتمادها صحيح." },
   { id: "c5", clean: true, type: "عقد مشروع", color: "#4A3A7A", no: "CNT-2240",
-    fields: [["المقاول", "مجموعة البناء الحديث"], ["المالك", "يوسف بن صالح الزهراني"], ["السجل التجاري", "٢٠٥٠١٨٨٤٠٢"], ["ينتهي السجل", "٣٠ يونيو ٢٠٢٨", "cr"],
-      ["المشروع", "ترميم مبنى الأرشيف"], ["طريقة الطرح", "منافسة عامة رقم ٨٨، تقدمت ٥ شركات"], ["قيمة العقد", SAR(1240000), "po"], ["مبلغ المستخلص", SAR(1240000), "inv"]],
+    fields: [["المقاول", "مجموعة البناء الحديث"], ["المالك", "يوسف بن صالح الزهراني"], ["السجل التجاري", "2050188402"], ["ينتهي السجل", "30 يونيو 2028", "cr"],
+      ["المشروع", "ترميم مبنى الأرشيف"], ["طريقة الطرح", "منافسة عامة رقم 88، تقدمت 5 شركات"], ["قيمة العقد", SAR(1240000), "po"], ["مبلغ المستخلص", SAR(1240000), "inv"]],
     manager: "هذا مبلغ كبير.. تأكد منه زين قبل لا تختم.",
     explain: "المبلغ تجاوز مليون ريال، لكنه طُرح في منافسة عامة تقدمت لها خمس شركات، وكل البيانات سليمة. رفضه يعطّل مشروعًا عامًا بلا سبب.",
     law: L.direct },
   { id: "c6", clean: true, type: "فاتورة تدريب", color: "#2B4A7A", no: "TRN-0331",
-    fields: [["المورد", "معهد المهارات للتدريب"], ["المالك", "ريم بنت فيصل الدوسري"], ["السجل التجاري", "٢٠٥٠٣٩٩٨٠٥"], ["ينتهي السجل", "٢ مارس ٢٠٢٨", "cr"],
-      ["البند", "دورة النزاهة في بيئة العمل لـ ٢٥ موظفًا"], REC("تم الحضور ٢–٤ ديسمبر"), ["مبلغ أمر الشراء", SAR(42000), "po"], ["مبلغ الفاتورة", SAR(42000), "inv"]],
+    fields: [["المورد", "معهد المهارات للتدريب"], ["المالك", "ريم بنت فيصل الدوسري"], ["السجل التجاري", "2050399805"], ["ينتهي السجل", "2 مارس 2028", "cr"],
+      ["البند", "دورة النزاهة في بيئة العمل لـ 25 موظفًا"], REC("تم الحضور 2–4 ديسمبر"), ["مبلغ أمر الشراء", SAR(42000), "po"], ["مبلغ الفاتورة", SAR(42000), "inv"]],
     manager: "المالكة اسمها الدوسري.. شيّك على سجل الإفصاح قبل لا تحكم.",
     explain: "تشابه اسم العائلة وحده ما يعني قرابة. سجل الإفصاح ما يذكر المالكة ضمن أقارب أي عضو، والدورة نُفذت، والمبلغ مطابق. اعتمادها صحيح." },
   { id: "c7", clean: true, type: "فاتورة توريد", color: "#1E5E45", no: "INV-4471",
-    fields: [["المورد", "مؤسسة الواحة للأثاث"], ["المالك", "ماجد بن حسن العمري"], ["السجل التجاري", "٢٠٥٠٤١٧٦٣٠"], ["ينتهي السجل", "١٧ يناير ٢٠٢٨", "cr"],
-      ["الصنف", "٣٦ كرسي لقاعة الاجتماعات"], REC("تم الاستلام ٤ ديسمبر"), ["مبلغ أمر الشراء", SAR(31800), "po"], ["مبلغ الفاتورة", SAR(31800), "inv"]],
+    fields: [["المورد", "مؤسسة الواحة للأثاث"], ["المالك", "ماجد بن حسن العمري"], ["السجل التجاري", "2050417630"], ["ينتهي السجل", "17 يناير 2028", "cr"],
+      ["الصنف", "36 كرسي لقاعة الاجتماعات"], REC("تم الاستلام 4 ديسمبر"), ["مبلغ أمر الشراء", SAR(31800), "po"], ["مبلغ الفاتورة", SAR(31800), "inv"]],
     envelope: { amount: 3000, line: "بمناسبة نهاية السنة.. لا تردنا." },
     manager: "الكراسي وصلت وركبوها، باقي الفاتورة.",
     explain: "المعاملة سليمة، والكراسي استُلمت، والمبلغ مطابق. اعتمادها صحيح." },
 
   /* ---- flawed ---- */
   { id: "f1", type: "فاتورة توريد", color: "#1E5E45", no: "INV-4430", flaw: "inv",
-    fields: [["المورد", "شركة الأفق للتجهيزات المكتبية"], ["المالك", "بدر بن ناصر الحربي"], ["السجل التجاري", "٢٠٥٠٤٤٨٢١٠"], ["ينتهي السجل", "٣ مارس ٢٠٢٨", "cr"],
-      ["الصنف", "٤٠ مكتب للموظفين"], REC("تم الاستلام ٥ ديسمبر"), ["مبلغ أمر الشراء", SAR(58000), "po"], ["مبلغ الفاتورة", SAR(85000), "inv"]],
+    fields: [["المورد", "شركة الأفق للتجهيزات المكتبية"], ["المالك", "بدر بن ناصر الحربي"], ["السجل التجاري", "2050448210"], ["ينتهي السجل", "3 مارس 2028", "cr"],
+      ["الصنف", "40 مكتب للموظفين"], REC("تم الاستلام 5 ديسمبر"), ["مبلغ أمر الشراء", SAR(58000), "po"], ["مبلغ الفاتورة", SAR(85000), "inv"]],
     manager: "مرّرها.. الشركة نعرفها.",
-    explain: "مبلغ الفاتورة أعلى من أمر الشراء بـ ٢٧٬٠٠٠ ريال. اعتمادها يعني صرف مال عام بغير وجه حق." },
+    explain: "مبلغ الفاتورة أعلى من أمر الشراء بـ 27,000 ريال. اعتمادها يعني صرف مال عام بغير وجه حق." },
   { id: "f2", type: "فاتورة خدمات", color: "#5B4A2A", no: "SRV-0912", flaw: "cr",
-    fields: [["المورد", "مؤسسة الساحل للصيانة"], ["المالك", "عبدالله بن مطلق الشمري"], ["السجل التجاري", "٢٠٥٠٣٣١٩٠٧"], ["ينتهي السجل", "٢ نوفمبر ٢٠٢٦", "cr"],
-      ["الخدمة", "صيانة مكيفات الدور الثاني"], REC("تم الاستلام ٦ ديسمبر"), ["مبلغ أمر الشراء", SAR(32500), "po"], ["مبلغ الفاتورة", SAR(32500), "inv"]],
+    fields: [["المورد", "مؤسسة الساحل للصيانة"], ["المالك", "عبدالله بن مطلق الشمري"], ["السجل التجاري", "2050331907"], ["ينتهي السجل", "2 نوفمبر 2026", "cr"],
+      ["الخدمة", "صيانة مكيفات الدور الثاني"], REC("تم الاستلام 6 ديسمبر"), ["مبلغ أمر الشراء", SAR(32500), "po"], ["مبلغ الفاتورة", SAR(32500), "inv"]],
     manager: "الصيانة مستعجلة، المكيفات خربانة والموظفين يشتكون.",
-    explain: "السجل التجاري انتهى في ٢ نوفمبر، قبل تاريخ المعاملة. ما يجوز التعامل مع مورد سجله غير ساري مهما كانت الحاجة مستعجلة.",
+    explain: "السجل التجاري انتهى في 2 نوفمبر، قبل تاريخ المعاملة. ما يجوز التعامل مع مورد سجله غير ساري مهما كانت الحاجة مستعجلة.",
     law: L.license },
   { id: "f3", type: "عقد توريد", color: "#4A3A7A", no: "CNT-2207", flaw: "owner",
-    fields: [["المورد", "شركة الدوسري المتحدة للتقنية"], ["المالك", "ماجد بن فهد بن سعد الدوسري", "owner"], ["السجل التجاري", "٢٠٥٠٧٧٢٥٤٤"], ["ينتهي السجل", "١٩ يناير ٢٠٢٨", "cr"],
-      ["البند", "اشتراك برامج المحاسبة لسنة"], REC("تم التفعيل ١ ديسمبر"), ["مبلغ أمر الشراء", SAR(74000), "po"], ["مبلغ الفاتورة", SAR(74000), "inv"]],
+    fields: [["المورد", "شركة الدوسري المتحدة للتقنية"], ["المالك", "ماجد بن فهد بن سعد الدوسري", "owner"], ["السجل التجاري", "2050772544"], ["ينتهي السجل", "19 يناير 2028", "cr"],
+      ["البند", "اشتراك برامج المحاسبة لسنة"], REC("تم التفعيل 1 ديسمبر"), ["مبلغ أمر الشراء", SAR(74000), "po"], ["مبلغ الفاتورة", SAR(74000), "inv"]],
     manager: "ممتازين هذولا، رئيس اللجنة بنفسه رشّحهم.",
     explain: "حسب سجل الإفصاح، المالك ماجد بن فهد هو ابن رئيس اللجنة. هذا تعارض مصالح، وترشيح الرئيس لهم يزيد الشبهة ولا ينفيها.",
     law: L.conflict },
   { id: "f4", type: "طلب صرف", color: "#2B4A7A", no: "PAY-3301", flaw: "total",
-    fields: [["المورد", "شركة الرقمية لأجهزة الحاسب"], ["المالك", "تركي بن فيصل المطيري"], ["السجل التجاري", "٢٠٥٠٦٦٠٣٢٨"], ["ينتهي السجل", "٢٢ سبتمبر ٢٠٢٨", "cr"],
+    fields: [["المورد", "شركة الرقمية لأجهزة الحاسب"], ["المالك", "تركي بن فيصل المطيري"], ["السجل التجاري", "2050660328"], ["ينتهي السجل", "22 سبتمبر 2028", "cr"],
       ["طريقة الطرح", "شراء مباشر"], ["الإجمالي المطلوب", SAR(1350000), "total"]],
     table: { head: ["أمر الشراء", "التاريخ", "الصنف", "المبلغ"], rows: [
-      ["٥١٠١", "٣ ديسمبر", "حاسب محمول ×١٠٠", SAR(450000)],
-      ["٥١٠٢", "٣ ديسمبر", "حاسب محمول ×١٠٠", SAR(450000)],
-      ["٥١٠٣", "٣ ديسمبر", "حاسب محمول ×١٠٠", SAR(450000)]] },
+      ["5101", "3 ديسمبر", "حاسب محمول ×100", SAR(450000)],
+      ["5102", "3 ديسمبر", "حاسب محمول ×100", SAR(450000)],
+      ["5103", "3 ديسمبر", "حاسب محمول ×100", SAR(450000)]] },
     envelope: { amount: 20000, line: "عشان المعاملة تمشي بسرعة، ولا من شاف ولا من دري." },
     manager: "الطلبات الثلاث كلها نفس اليوم، اختمها مرة وحدة وخلصنا.",
     explain: "ثلاث أوامر شراء لنفس الصنف ونفس المورد في يوم واحد، كل واحد تحت المليون ومجموعها مليون وثلاثمئة وخمسون ألف ريال. هذي تجزئة للتهرب من المنافسة العامة.",
     law: L.split },
   { id: "f5", type: "طلب صرف", color: "#2B4A7A", no: "PAY-3318", flaw: "method",
-    fields: [["المورد", "شركة المسار للسيارات"], ["المالك", "سلطان بن خالد العنزي"], ["السجل التجاري", "٢٠٥٠٢٩٤٨٨٦"], ["ينتهي السجل", "٩ أبريل ٢٠٢٨", "cr"],
-      ["الصنف", "٨ سيارات خدمة"], ["طريقة الطرح", "شراء مباشر", "method"], REC("تم الاستلام ٨ ديسمبر"), ["المبلغ", SAR(1480000), "inv"]],
+    fields: [["المورد", "شركة المسار للسيارات"], ["المالك", "سلطان بن خالد العنزي"], ["السجل التجاري", "2050294886"], ["ينتهي السجل", "9 أبريل 2028", "cr"],
+      ["الصنف", "8 سيارات خدمة"], ["طريقة الطرح", "شراء مباشر", "method"], REC("تم الاستلام 8 ديسمبر"), ["المبلغ", SAR(1480000), "inv"]],
     manager: "احتجنا السيارات بسرعة، فاشتريناها مباشرة. عادي.",
     explain: "مبلغ الشراء يتجاوز مليون ريال، والسيارات متوفرة لدى أكثر من مورد. كان لازم تُطرح في منافسة عامة يتنافس فيها الكل.",
     law: L.direct },
   { id: "f6", type: "عقد خدمات", color: "#4A3A7A", no: "CNT-2251", flaw: "owner",
-    fields: [["المورد", "مؤسسة القحطاني للحلول الإدارية"], ["المالك", "سلمان بن علي القحطاني", "owner"], ["السجل التجاري", "٢٠٥٠٥١٠٧٧٢"], ["ينتهي السجل", "٢٨ فبراير ٢٠٢٨", "cr"],
-      ["الخدمة", "تنظيم الأرشيف وأرشفته إلكترونيًا"], REC("تم الاستلام ٧ ديسمبر"), ["مبلغ أمر الشراء", SAR(96000), "po"], ["مبلغ الفاتورة", SAR(96000), "inv"]],
+    fields: [["المورد", "مؤسسة القحطاني للحلول الإدارية"], ["المالك", "سلمان بن علي القحطاني", "owner"], ["السجل التجاري", "2050510772"], ["ينتهي السجل", "28 فبراير 2028", "cr"],
+      ["الخدمة", "تنظيم الأرشيف وأرشفته إلكترونيًا"], REC("تم الاستلام 7 ديسمبر"), ["مبلغ أمر الشراء", SAR(96000), "po"], ["مبلغ الفاتورة", SAR(96000), "inv"]],
     manager: "سلمان من ربعنا، يعرف شغله زين.",
     explain: "حسب سجل الإفصاح، المؤسسة يملكها سلمان القحطاني عضو لجنة الفحص نفسه. ما يصير الموظف يفحص ويعتمد معاملة لمؤسسته هو.",
     law: L.conflict },
   { id: "f7", type: "فاتورة توريد وتركيب", color: "#1E5E45", no: "INV-4488", flaw: "rec",
-    fields: [["المورد", "شركة الرؤية للأنظمة الأمنية"], ["المالك", "نايف بن عبدالعزيز الرشيد"], ["السجل التجاري", "٢٠٥٠٧٣٠٠٥١"], ["ينتهي السجل", "١١ نوفمبر ٢٠٢٧", "cr"],
-      ["الصنف", "تركيب ٢٤ كاميرا مراقبة"], REC("لم يتم الاستلام"), ["مبلغ أمر الشراء", SAR(64000), "po"], ["مبلغ الفاتورة", SAR(64000), "inv"]],
+    fields: [["المورد", "شركة الرؤية للأنظمة الأمنية"], ["المالك", "نايف بن عبدالعزيز الرشيد"], ["السجل التجاري", "2050730051"], ["ينتهي السجل", "11 نوفمبر 2027", "cr"],
+      ["الصنف", "تركيب 24 كاميرا مراقبة"], REC("لم يتم الاستلام"), ["مبلغ أمر الشراء", SAR(64000), "po"], ["مبلغ الفاتورة", SAR(64000), "inv"]],
     envelope: { amount: 10000, line: "اصرفها اليوم وهذا لك، والتركيب الأسبوع الجاي." },
     manager: "اصرفها الحين، والتركيب بعدين.",
     explain: "محضر الاستلام يقول إن الكاميرات ما رُكّبت. ما يُصرف مال لعمل ما تم استلامه." },
   { id: "f8", type: "فاتورة توريد", color: "#1E5E45", no: "INV-4399", flaw: "paid",
-    fields: [["المورد", "مؤسسة البيان للمستلزمات"], ["المالك", "هند بنت صالح القرني"], ["السجل التجاري", "٢٠٥٠٦١٨٤٢٧"], ["ينتهي السجل", "٥ يوليو ٢٠٢٧", "cr"],
-      ["الصنف", "أحبار طابعات"], REC("تم الاستلام ٢٨ نوفمبر"), ["سجل الصرف", "صُرفت هذه الفاتورة في ٢ ديسمبر", "paid"], ["مبلغ الفاتورة", SAR(14700), "inv"]],
+    fields: [["المورد", "مؤسسة البيان للمستلزمات"], ["المالك", "هند بنت صالح القرني"], ["السجل التجاري", "2050618427"], ["ينتهي السجل", "5 يوليو 2027", "cr"],
+      ["الصنف", "أحبار طابعات"], REC("تم الاستلام 28 نوفمبر"), ["سجل الصرف", "صُرفت هذه الفاتورة في 2 ديسمبر", "paid"], ["مبلغ الفاتورة", SAR(14700), "inv"]],
     manager: "المورد يقول ما وصله شي، اصرفها له مرة ثانية.",
     explain: "سجل الصرف يبيّن إن نفس الفاتورة صُرفت قبل أسبوع. صرفها مرة ثانية يعني دفع المال العام مرتين." }
 ];
@@ -650,16 +685,31 @@ function drawRoom(t) {
   R(118, 36, 8, 6, "#B9A27A"); R(140, 32, 12, 10, "#B9A27A"); R(145, 22, 6, 6, "#F2D46B");
   for (let y = 17; y < 40; y += 4) R(111, y, 50, 1, "#C9DCE8");
   R(135, 17, 2, 44, "#D9CFB4"); R(104, 64, 64, 3, "#B3A88A");
-  // clock (minute hand moves)
-  R(66, 16, 18, 18, "#E8E2D4"); R(67, 17, 16, 16, "#FFFFFF");
-  R(74, 19, 2, 7, "#2A2A2A");
-  const m = Math.floor(t / 2000) % 4; const hands = [[75, 25, 5, 2], [75, 25, 2, 5], [70, 25, 5, 2], [74, 20, 2, 5]];
+  // clock (moved under the window ledge)
+  R(84, 72, 16, 16, "#E8E2D4"); R(85, 73, 14, 14, "#FFFFFF");
+  R(91, 75, 2, 6, "#2A2A2A");
+  const m = Math.floor(t / 2000) % 4; const hands = [[92, 80, 5, 2], [92, 80, 2, 5], [87, 80, 5, 2], [91, 76, 2, 5]];
   R(...hands[m], "#2A2A2A");
-  // notice board
-  R(12, 14, 42, 34, "#6B4320"); R(14, 16, 38, 30, "#B88A57");
-  R(17, 19, 14, 10, "#F5EFDC"); R(34, 21, 15, 12, "#F2E28A"); R(19, 33, 12, 9, "#F4C7C0");
-  R(23, 19, 2, 2, "#C0392B"); R(41, 21, 2, 2, "#C0392B"); R(25, 33, 2, 2, "#C0392B");
-  R(19, 22, 10, 1, "#D8CDAE"); R(19, 25, 8, 1, "#D8CDAE");
+  // notice board: the occasion
+  R(12, 14, 42, 38, "#6B4320"); R(14, 16, 38, 34, "#B88A57");
+  R(16, 18, 34, 17, "#F2E28A"); R(32, 18, 2, 2, "#C0392B");
+  R(18, 38, 13, 9, "#F5EFDC"); R(34, 37, 14, 10, "#F4C7C0");
+  R(24, 38, 2, 2, "#C0392B"); R(40, 37, 2, 2, "#C0392B");
+  R(20, 41, 9, 1, "#D8CDAE"); R(20, 44, 7, 1, "#D8CDAE"); R(36, 41, 10, 1, "#D8A9A2"); R(36, 44, 8, 1, "#D8A9A2");
+  // tear-off calendar from نادي نزاهة
+  R(80, 6, 2, 2, "#2A2A2A");
+  for (let i = 0; i < 6; i++) { R(80 - i * 3, 8 + i, 3, 1, "#2A2A2A"); R(81 + i * 3, 8 + i, 3, 1, "#2A2A2A"); }
+  R(60, 14, 43, 50, "#3a2a1a");
+  R(59, 13, 43, 50, "#6B4320");
+  R(60, 14, 41, 11, "#1E5E45");
+  R(61, 26, 39, 36, "#FFFDF7");
+  R(61, 60, 39, 2, "#E5DCC4");
+  for (const x of [66, 74, 86, 94]) R(x, 25, 2, 2, "#3a2a1a");
+  // hand-drawn red circle around the day
+  for (let a = 0; a < 360; a += 4) {
+    const rx = 80.5 + Math.cos(a * Math.PI / 180) * 10.5, ry = 38 + Math.sin(a * Math.PI / 180) * 8.5;
+    R(Math.round(rx), Math.round(ry), 1, 1, "#C0392B");
+  }
   // cabinet
   R(12, 60, 26, 40, "#7D8A86"); R(12, 60, 26, 1, "#9AA7A3");
   for (const y of [63, 75, 87]) { R(14, y, 22, 10, "#6A7773"); R(22, y + 4, 6, 2, "#C8CFCD"); }
@@ -701,6 +751,18 @@ function drawRoom(t) {
   R(10, 190, 22, 14, "#4A4A4A"); R(12, 192, 18, 10, "#A23434");
   if (!anim.stamp) drawStamp(15, 154);
 }
+function calText() {
+  const T = (str, x, y, size, color, weight) => {
+    cx.save(); cx.font = `${weight || 700} ${size * K}px "Noto Kufi Arabic", Tahoma, sans-serif`;
+    cx.fillStyle = color; cx.textAlign = "center"; cx.textBaseline = "middle"; cx.direction = "rtl";
+    cx.fillText(str, x * K, y * K); cx.restore();
+  };
+  T("نادي نزاهة", 80.5, 19.6, 5.6, "#FFFFFF", 800);
+  T("9", 80.5, 38, 13, "#C0392B", 800);
+  T("ديسمبر 2026", 80.5, 53.5, 4.8, "#2A2420", 700);
+  T("اليوم العالمي", 33, 23.5, 4.4, "#5a3a10", 800);
+  T("لمكافحة الفساد", 33, 30, 4.4, "#5a3a10", 800);
+}
 function drawStamp(x, y) {
   R(x - 3, y + 22, 18, 4, "#3E2F7A");
   R(x, y + 6, 12, 16, "#6A4FB3"); R(x, y + 6, 3, 16, "#8E77D6");
@@ -731,6 +793,21 @@ function frame(now) {
   anim.envX += (anim.envTarget - anim.envX) * 0.15; if (Math.abs(anim.envTarget - anim.envX) < 0.5) anim.envX = anim.envTarget;
   cx.clearRect(0, 0, cv.width, cv.height);
   drawRoom(now);
+  calText();
+  if (anim.tear && now > anim.tear) {
+    const p = (now - anim.tear) / 1100;
+    if (p >= 1) anim.tear = 0;
+    else {
+      cx.save(); cx.globalAlpha = 1 - p * p;
+      cx.translate((80.5 + 26 * p) * K, (44 + 70 * p * p) * K); cx.rotate(p * 1.1);
+      cx.fillStyle = "#FFFDF7"; cx.fillRect(-19.5 * K, -18 * K, 39 * K, 36 * K);
+      cx.fillStyle = "#E5DCC4"; cx.fillRect(-19.5 * K, 16 * K, 39 * K, 2 * K);
+      cx.font = `800 ${13 * K}px "Noto Kufi Arabic", Tahoma, sans-serif`; cx.textAlign = "center"; cx.textBaseline = "middle";
+      cx.fillStyle = "#2A2420"; cx.fillText("8", 0, -6 * K);
+      cx.font = `700 ${4.8 * K}px "Noto Kufi Arabic", Tahoma, sans-serif`; cx.fillText("ديسمبر 2026", 0, 9.5 * K);
+      cx.restore();
+    }
+  }
   drawDoc(CASES[S ? S.i : 0]);
   drawEnvelope();
   if (anim.stamp) {
@@ -790,12 +867,13 @@ function say(who, text) {
 /* ---------- flow ---------- */
 function setMeter() {
   const v = Math.min(100, S.sus);
-  $("meter-fill").style.width = v + "%"; $("meter-num").textContent = AR(v) + "٪";
+  $("meter-fill").style.width = v + "%"; $("meter-num").textContent = AR(v) + "%";
   $("meter").classList.toggle("hot", v >= 60);
 }
 function loadCase() {
   const c = CASES[S.i];
   S.decided = false; S.looked = false; S.env = c.envelope ? "pending" : null;
+  if (S.i === 0) anim.tear = performance.now() + 500;
   $("hud-count").textContent = AR(S.i + 1) + " / " + AR(CASES.length);
   $("doc-label").textContent = c.type;
   $("stamp-mark").hidden = true;
@@ -818,7 +896,7 @@ function openDoc() {
   const c = CASES[S.i];
   S.looked = true; $("doc-tap").hidden = true;
   $("doc-head").parentNode.style.background = c.color;
-  $("doc-head").innerHTML = `${c.type} <small>رقم <bdi>${c.no}</bdi> · ٩ ديسمبر ٢٠٢٦</small>`;
+  $("doc-head").innerHTML = `${c.type} <small>رقم <bdi>${c.no}</bdi> · 9 ديسمبر 2026</small>`;
   $("doc-mgr").textContent = c.manager;
   renderEnv();
   $("doc-scroll").scrollTop = 0;
@@ -914,10 +992,10 @@ function showEnd() {
   else if (S.correct >= n - 2) { title = "نزيه.. وقريب من الكمال"; text = "ما أخذت شي، لكن فاتتك معاملات تستاهل نظرة ثانية. ارجع للائحة وجرب مرة ثانية."; }
   else { title = "متساهل"; text = "ما قبلت رشوة، لكن مرّت من تحت ختمك مخالفات كثيرة. التساهل باب يدخل منه الفساد."; }
   $("e-title").textContent = title; $("e-text").textContent = text;
-  $("e-correct").textContent = AR(S.correct) + "/" + AR(n);
+  $("e-correct").textContent = AR(S.correct) + " من " + AR(n);
   $("e-env").textContent = AR(S.envTaken);
-  $("e-sus").textContent = AR(Math.min(100, S.sus)) + "٪";
-  $("e-log").innerHTML = S.log.map((l) => `<div class="${l.right && l.env !== "taken" ? "" : "x"}"><span>${l.supplier}</span><span>${l.approve ? "معتمد" : "مرفوض"}${l.right ? "" : " ✗"}${l.env === "taken" ? " · ظرف" : ""}</span></div>`).join("");
+  $("e-sus").textContent = AR(Math.min(100, S.sus)) + "%";
+  $("e-log").innerHTML = S.log.map((l, i) => { const g = l.right && l.env !== "taken"; return `<div class="mk"><i class="${g ? "ok" : "no"}">${g ? "✓" : "✗"}</i><small>${i + 1}</small></div>`; }).join("");
   (S.envTaken === 0 && !caught && S.correct >= n - 2) ? SFX.good() : SFX.bad();
 }
 function start() {
@@ -951,7 +1029,7 @@ $("btn-mute").onclick = () => { muted = !muted; $("btn-mute").textContent = mute
 $("btn-mute").textContent = muted ? "صامت" : "صوت";
 
 function key(k) {
-  if (document.querySelector(".qirtas-splash")) return;
+  if (document.querySelector(".qirtas-splash") || !$("collab-card").hidden) return;
   if (!$("s-title").hidden) { if (k === "Enter" || k === " ") start(); return; }
   if (!$("s-end").hidden) { if (k === "Enter") start(); return; }
   if (!$("ov-verdict").hidden) { if (k === "Enter" || k === " ") next(); return; }
@@ -991,8 +1069,16 @@ S = fresh();
 requestAnimationFrame(frame);
 if (window.Qirtas) {
   $("credit-title").appendChild(Qirtas.credit({ theme: "dark" }));
+  $("credit-title").insertAdjacentHTML("beforeend", '<div class="collab">بالتعاون مع <b>نادي نزاهة</b></div>');
   $("credit-end").appendChild(Qirtas.credit({ theme: "dark" }));
-  Qirtas.splash({ theme: "dark", pixel: true, container: $("app") });
+  Qirtas.splash({ theme: "dark", pixel: true, container: $("app") }).then(showCollab);
+} else showCollab();
+function showCollab() {
+  const c = $("collab-card"); c.hidden = false; c.style.transition = "opacity .4s"; c.style.opacity = "1";
+  let done = false;
+  const end = () => { if (done) return; done = true; c.style.opacity = "0"; setTimeout(() => { c.hidden = true; }, 400); removeEventListener("keydown", end, true); };
+  c.addEventListener("pointerdown", end); addEventListener("keydown", end, true);
+  setTimeout(end, 2000);
 }
 })();
 </script>
