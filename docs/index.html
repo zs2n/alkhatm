@@ -114,7 +114,19 @@ table.items th { background: #ece3c8; font-weight: 700; }
 .paper-foot button, .env-bar button { position: relative; }
 .paper-foot { display: flex; gap: 8px; padding: 0 14px 14px; }
 .paper-foot button { flex: 1; padding: 10px; font-weight: 600; font-size: 14px; background: var(--panel); color: var(--text); border: 2px solid #000; }
-.doc-ov { padding: 10px; align-items: stretch; }
+.desk-col { display: contents; }
+.doc-ov { top: 22%; padding: 0 8px; align-items: flex-end; background: linear-gradient(rgba(8,12,10,0), rgba(8,12,10,.55) 30%); }
+.doc-ov .sheet { box-shadow: 0 -4px 0 #000, 6px 0 0 #000; }
+@media (min-width: 880px) and (min-height: 560px) {
+  #app { max-width: 1040px; }
+  #s-game { flex-direction: row; gap: 18px; padding: 12px 16px; }
+  .desk-col { display: flex; flex-direction: column; width: 440px; flex: none; min-height: 0; }
+  #ov-doc { position: relative; inset: auto; top: auto; flex: 1; min-width: 0; padding: 0; background: none; align-items: flex-start; z-index: 1; }
+  #ov-doc[hidden] { display: flex !important; visibility: hidden; }
+  .doc-ov .sheet { box-shadow: 6px 6px 0 #000; }
+  .desk-col .actions, .doc-tap, .sheet .x { display: none !important; }
+  .desk-col .meter-wrap { margin-bottom: 12px; }
+}
 .sheet { display: flex; flex-direction: column; overflow: hidden; max-height: 100%; }
 .sheet .paper-head { flex: none; }
 .sheet .x { background: rgba(0,0,0,.25); color: #fff; width: 32px; height: 32px; font-size: 16px; flex: none; }
@@ -190,6 +202,7 @@ table.items th { background: #ece3c8; font-weight: 700; }
   </section>
 
   <section class="screen" id="s-game" hidden>
+   <div class="desk-col">
     <div class="hud">
       <span class="day">اليوم الأول</span>
       <span class="count" id="hud-count">١ / ٧</span>
@@ -222,6 +235,7 @@ table.items th { background: #ece3c8; font-weight: 700; }
       <button class="btn look" id="btn-look"><span class="key">␣</span>افحص</button>
       <button class="btn no" id="btn-no"><span class="key">←</span>مرفوض</button>
     </div>
+   </div>
 
     <div class="overlay doc-ov" id="ov-doc" hidden>
       <div class="paper sheet" role="dialog" aria-label="المعاملة">
