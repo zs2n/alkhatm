@@ -114,7 +114,25 @@ table.items th { background: #ece3c8; font-weight: 700; }
 .paper-foot button, .env-bar button { position: relative; }
 .paper-foot { display: flex; gap: 8px; padding: 0 14px 14px; }
 .paper-foot button { flex: 1; padding: 10px; font-weight: 600; font-size: 14px; background: var(--panel); color: var(--text); border: 2px solid #000; }
-.rules ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 8px; font-size: 15px; line-height: 1.7; }
+.doc-ov { padding: 10px; align-items: stretch; }
+.sheet { display: flex; flex-direction: column; overflow: hidden; max-height: 100%; }
+.sheet .paper-head { flex: none; }
+.sheet .x { background: rgba(0,0,0,.25); color: #fff; width: 32px; height: 32px; font-size: 16px; flex: none; }
+.sheet .scroll { flex: 1; overflow: auto; min-height: 0; -webkit-overflow-scrolling: touch; }
+.mgr { margin: 10px 14px 0; padding: 8px 10px; background: #2A3A33; color: var(--text); font-family: var(--f-ui); font-size: 13px; line-height: 1.7; }
+.mgr span { color: var(--gold); font-weight: 600; }
+.mgr q { quotes: "«" "»"; }
+.env-box { margin: 10px 14px 0; padding: 10px; background: #F2E3B8; border: 2px dashed #8a6a2a; font-family: var(--f-ui); font-size: 14px; display: grid; gap: 8px; }
+.env-box p { margin: 0; line-height: 1.7; }
+.env-btns { display: flex; gap: 8px; }
+.env-btns button { flex: 1; padding: 9px; font-weight: 700; font-size: 14px; position: relative; }
+.env-btns .ret { background: var(--panel); color: var(--text); }
+.env-btns .tak { background: #8a6a2a; color: #fff; }
+.rules { margin: 6px 14px 14px; padding-top: 10px; border-top: 3px double var(--paper-rule); font-family: var(--f-doc); }
+.rules h4 { margin: 0 0 8px; font-family: var(--f-ui); font-size: 14px; color: #3E4E8C; }
+.decide { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; background: var(--panel); border-top: 2px solid #000; }
+.decide .btn { font-size: 18px; padding: 12px 6px; }
+.rules ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 6px; font-size: 14px; line-height: 1.7; }
 .rules .note { font-size: 12px; color: #6b5e4c; margin-top: 10px; }
 .rules .people { margin-top: 10px; font-size: 14px; background: #ece3c8; padding: 8px 10px; display: grid; gap: 4px; }
 .rules .people .pp { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; border-top: 1px dashed var(--paper-rule); padding-top: 4px; }
@@ -165,8 +183,8 @@ table.items th { background: #ece3c8; font-weight: 700; }
     <p>موظف جديد في إدارة المشتريات. افحص كل معاملة، طابقها مع اللائحة، واختم بالقرار الصحيح.</p>
     <button class="start" id="btn-start">ابدأ الدوام</button>
     <div class="controls">
-      <span>الجوال: الأزرار في أسفل الشاشة، والمس الورقة لفحصها</span>
-      <span>الكيبورد: → اعتماد · ← رفض · مسافة فحص · R اللائحة</span>
+      <span>اقرأ المعاملة، طابقها مع اللائحة اللي تحتها، واختم</span>
+      <span>الكيبورد: → اعتماد · ← رفض · R اللائحة · Q/E الظرف</span>
     </div>
     <div class="credit" id="credit-title"></div>
   </section>
@@ -205,21 +223,21 @@ table.items th { background: #ece3c8; font-weight: 700; }
       <button class="btn no" id="btn-no"><span class="key">←</span>مرفوض</button>
     </div>
 
-    <div class="overlay" id="ov-doc" hidden>
-      <div class="paper" role="dialog" aria-label="المعاملة">
-        <div class="paper-head" id="doc-head"></div>
-        <div class="paper-body" id="doc-body"></div>
-        <div class="paper-foot">
-          <button id="btn-rules"><span class="key">R</span>اللائحة</button>
-          <button id="btn-close">رجوع للمكتب</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="overlay" id="ov-rules" hidden>
-      <div class="paper rules" role="dialog" aria-label="لائحة الإدارة">
-        <div class="paper-head" style="background:#3E4E8C">لائحة إدارة المشتريات <small>للاستخدام الداخلي</small></div>
-        <div class="paper-body">
+    <div class="overlay doc-ov" id="ov-doc" hidden>
+      <div class="paper sheet" role="dialog" aria-label="المعاملة">
+        <div class="paper-head"><span id="doc-head"></span><button class="x" id="btn-close" aria-label="رجوع للمكتب">✕</button></div>
+        <div class="scroll" id="doc-scroll">
+          <div class="mgr"><span>المدير:</span> <q id="doc-mgr"></q></div>
+          <div class="env-box" id="doc-env" hidden>
+            <p id="doc-env-line"></p>
+            <div class="env-btns" id="doc-env-btns">
+              <button class="ret" id="d-return"><span class="key">Q</span>رُدّ الظرف</button>
+              <button class="tak" id="d-take"><span class="key">E</span>خذ الظرف</button>
+            </div>
+          </div>
+          <div class="paper-body" id="doc-body"></div>
+          <section class="rules" id="rules-inline">
+            <h4>اللائحة: طابق المعاملة مع هذي القواعد</h4>
           <ol>
             <li>يكون السجل التجاري للمورد ساريًا في تاريخ المعاملة.</li>
             <li>يطابق مبلغ الفاتورة مبلغ أمر الشراء.</li>
@@ -235,8 +253,12 @@ table.items th { background: #ece3c8; font-weight: 700; }
             <div class="pp"><span>نورة بنت محمد الشهري (عضو)</span><span>لا يوجد</span></div>
           </div>
           <div class="note">تاريخ اليوم: ٩ ديسمبر ٢٠٢٦ · الأسماء والمبالغ افتراضية، والقواعد مختصرة من الأنظمة السعودية.</div>
+          </section>
         </div>
-        <div class="paper-foot"><button id="btn-rules-close">رجوع</button></div>
+        <div class="decide">
+          <button class="btn ok" id="d-ok"><span class="key">→</span>معتمد</button>
+          <button class="btn no" id="d-no"><span class="key">←</span>مرفوض</button>
+        </div>
       </div>
     </div>
 
@@ -553,7 +575,7 @@ let CASES = drawRound();
 
 /* ---------- state ---------- */
 let S;
-function fresh() { return { i: 0, sus: 0, correct: 0, envTaken: 0, envMoney: 0, log: [], decided: false, env: null, looked: false }; }
+function fresh() { return { cases: CASES, i: 0, sus: 0, correct: 0, envTaken: 0, envMoney: 0, log: [], decided: false, env: null, looked: false }; }
 
 /* ---------- sound ---------- */
 let AC = null, muted = false;
@@ -761,18 +783,18 @@ function loadCase() {
   $("env-bar").hidden = true;
   anim.ring = performance.now() + 900; SFX.ring();
   setTimeout(() => say("المدير", c.manager), 350);
-  if (c.envelope) setTimeout(() => {
-    anim.envTarget = 0; SFX.paper();
-    $("env-bar").hidden = false;
-    say("المندوب", c.envelope.line);
-  }, 2600);
+  if (c.envelope) setTimeout(() => { anim.envTarget = 0; SFX.paper(); }, 600);
+  setTimeout(() => { if (S.cases === CASES && CASES[S.i] === c && !S.decided) openDoc(); }, 1300);
 }
 function openDoc() {
   if (S.decided) return;
   const c = CASES[S.i];
   S.looked = true; $("doc-tap").hidden = true;
-  $("doc-head").style.background = c.color;
+  $("doc-head").parentNode.style.background = c.color;
   $("doc-head").innerHTML = `${c.type} <small>رقم <bdi>${c.no}</bdi> · ٩ ديسمبر ٢٠٢٦</small>`;
+  $("doc-mgr").textContent = c.manager;
+  renderEnv();
+  $("doc-scroll").scrollTop = 0;
   let h = c.fields.map(([k, v, key]) => `<div class="row tap" data-key="${key || ""}"><span>${k}</span><b>${v}</b></div>`).join("");
   if (c.table) h += `<table class="items"><tr>${c.table.head.map((x) => `<th>${x}</th>`).join("")}</tr>${c.table.rows.map((r) => `<tr>${r.map((x) => `<td>${x}</td>`).join("")}</tr>`).join("")}</table>`;
   h += `<div class="sig"><span>المحاسب: ع. الخالدي</span><span>توقيع المورد ~~~~</span></div>`;
@@ -781,8 +803,16 @@ function openDoc() {
   $("ov-doc").hidden = false; SFX.paper();
 }
 const closeDoc = () => { $("ov-doc").hidden = true; };
-const openRules = () => { $("ov-rules").hidden = false; SFX.paper(); };
-const closeRules = () => { $("ov-rules").hidden = true; };
+const openRules = () => { if ($("ov-doc").hidden) openDoc(); $("rules-inline").scrollIntoView({ behavior: "smooth", block: "start" }); };
+function renderEnv() {
+  const c = CASES[S.i], box = $("doc-env");
+  box.hidden = !c.envelope;
+  if (!c.envelope) return;
+  const pend = S.env === "pending";
+  $("doc-env-btns").hidden = !pend;
+  $("doc-env-line").textContent = pend ? `المندوب ترك ظرفًا على مكتبك وقال: «${c.envelope.line}»`
+    : S.env === "taken" ? "أخذت الظرف." : "رددت الظرف للمندوب.";
+}
 function envelope(take) {
   if (S.env !== "pending" || S.decided) return;
   const c = CASES[S.i];
@@ -790,12 +820,18 @@ function envelope(take) {
   $("env-bar").hidden = true;
   if (take) { S.envTaken++; S.envMoney += c.envelope.amount; S.sus += 30; anim.envTarget = 70; SFX.coin(); say("المندوب", "الله يعطيك العافية.. بيننا."); }
   else { anim.envTarget = 70; SFX.paper(); say("المندوب", "براحتك.. مثل ما تشوف."); }
-  setMeter();
+  setMeter(); renderEnv();
 }
 function decide(approve) {
-  if (S.decided || anyOverlay()) return;
+  if (S.decided || !$("ov-verdict").hidden) return;
   const c = CASES[S.i];
-  if (S.env === "pending") { say("أنت", "لازم أقرر بخصوص الظرف أول."); SFX.bad(); return; }
+  if (S.env === "pending") {
+    if ($("ov-doc").hidden) openDoc();
+    const box = $("doc-env"); box.scrollIntoView({ block: "nearest" });
+    box.animate && box.animate([{ transform: "translateX(0)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "translateX(0)" }], { duration: 240 });
+    SFX.bad(); return;
+  }
+  closeDoc();
   S.decided = true;
   const right = approve === (c.flaw === null);
   anim.stamp = { start: performance.now(), hit: false, onHit: () => {
@@ -859,7 +895,7 @@ function start() {
   fit(); drawPortrait(false);
   loadCase();
 }
-const anyOverlay = () => !$("ov-doc").hidden || !$("ov-rules").hidden || !$("ov-verdict").hidden;
+const anyOverlay = () => !$("ov-doc").hidden || !$("ov-verdict").hidden;
 
 /* ---------- input ---------- */
 $("btn-start").onclick = start;
@@ -869,8 +905,10 @@ $("btn-no").onclick = () => decide(false);
 $("btn-look").onclick = openDoc;
 $("doc-hit").onclick = openDoc;
 $("btn-close").onclick = closeDoc;
-$("btn-rules").onclick = openRules;
-$("btn-rules-close").onclick = closeRules;
+$("d-ok").onclick = () => decide(true);
+$("d-no").onclick = () => decide(false);
+$("d-return").onclick = () => envelope(false);
+$("d-take").onclick = () => envelope(true);
 $("btn-next").onclick = next;
 $("btn-return").onclick = () => envelope(false);
 $("btn-take").onclick = () => envelope(true);
@@ -882,12 +920,7 @@ function key(k) {
   if (!$("s-title").hidden) { if (k === "Enter" || k === " ") start(); return; }
   if (!$("s-end").hidden) { if (k === "Enter") start(); return; }
   if (!$("ov-verdict").hidden) { if (k === "Enter" || k === " ") next(); return; }
-  if (!$("ov-rules").hidden) { if (k === "Escape" || k === "r" || k === "R" || k === " ") closeRules(); return; }
-  if (!$("ov-doc").hidden) {
-    if (k === "r" || k === "R") openRules();
-    else if (k === "Escape" || k === " ") closeDoc();
-    return;
-  }
+  if (!$("ov-doc").hidden && (k === "Escape" || k === " ")) { closeDoc(); return; }
   if (k === "ArrowRight" || k === "d" || k === "D") decide(true);
   else if (k === "ArrowLeft" || k === "a" || k === "A") decide(false);
   else if (k === " " || k === "f" || k === "F") openDoc();
@@ -908,8 +941,8 @@ function pollPad() {
   const map = { 0: "Enter", 1: "Escape", 2: " ", 3: "R", 4: "Q", 5: "E", 9: "Enter", 14: "ArrowLeft", 15: "ArrowRight" };
   p.buttons.forEach((b, i) => {
     if (b.pressed && !padPrev[i]) {
-      if (i === 0) { $("ov-doc").hidden && $("ov-rules").hidden && $("ov-verdict").hidden && $("s-game").hidden === false ? decide(true) : key("Enter"); }
-      else if (i === 1) { anyOverlay() ? key("Escape") : decide(false); }
+      if (i === 0) { $("ov-verdict").hidden && !$("s-game").hidden ? decide(true) : key("Enter"); }
+      else if (i === 1) { decide(false); }
       else if (map[i]) key(map[i]);
     }
     padPrev[i] = b.pressed;
