@@ -1033,26 +1033,32 @@ function armIdle() {
   clearTimeout(idleT);
   if (!$("s-title").hidden) idleT = setTimeout(runWalker, 30000);
 }
+const WALK_SPEED = 70; // px per second, same for walking in and out so the feet match the ground
+const WALK_STEP_MS = 170; // one walk frame every 170ms: 4 frames = one full stride
 function runWalker() {
   if ($("s-title").hidden || walkOn) return;
   const el = $("walker"), W = $("s-title").clientWidth;
-  const startX = W + 10, stopX = W * 0.6;
+  const startX = W + 10, stopX = W * 0.6, outX = -WALK_CELL - 10;
+  const inDur = (startX - stopX) / WALK_SPEED * 1000, outDur = (stopX - outX) / WALK_SPEED * 1000;
   const phases = [
-    { k: "walk", from: startX, to: stopX, dur: 3200 },
+    { k: "walk", from: startX, to: stopX, dur: inDur },
     { k: "frame", frame: WALK_IDLE, dur: 1200 },
     { k: "frame", frame: WALK_WAVE, dur: 2000 },
-    { k: "walk", from: stopX, to: -WALK_CELL - 10, dur: 3200 }
+    { k: "walk", from: stopX, to: outX, dur: outDur }
   ];
-  let pi = 0, pStart = null;
+  let pi = 0, pStart = null, walkT = 0;
   walkOn = true; el.hidden = false;
   function tick(now) {
     if (!walkOn) return;
     if (pStart === null) pStart = now;
     const p = phases[pi], k = Math.min(1, (now - pStart) / p.dur);
     if (p.k === "walk") {
-      el.style.transform = "translateX(" + (p.from + (p.to - p.from) * k) + "px)";
-      setWalkFrame(Math.floor(now / 140) % 4);
+      const f = Math.floor((now - pStart) / WALK_STEP_MS) % 4;
+      const bob = (f % 2) ? -2 : 0; // small lift on the passing poses
+      el.style.transform = "translate(" + (p.from + (p.to - p.from) * k) + "px," + bob + "px)";
+      setWalkFrame(f);
     } else {
+      el.style.transform = "translate(" + stopX + "px,0px)"; // hold at the stop point while idle and waving
       setWalkFrame(p.frame);
     }
     if (k >= 1) {
