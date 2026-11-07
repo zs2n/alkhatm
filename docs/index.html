@@ -185,9 +185,6 @@ table.items th { background: #ece3c8; font-weight: 700; }
 .title-screen p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.8; max-width: 32ch; }
 .title-screen .start { margin-top: 10px; padding: 14px 40px; font-size: 20px; font-weight: 800; background: var(--green); color: #fff; box-shadow: inset 0 -6px 0 rgba(0,0,0,.35); }
 .controls { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
-/* idle walker on the title screen: 6-frame strip (4 walk, idle, wave), 250x420 cells scaled to 120px tall */
-.walker { position: absolute; left: 0; bottom: 112px; width: 71px; height: 120px; background: url("walker.webp") no-repeat 0 0; background-size: 428.6px 120px; pointer-events: none; z-index: 2; will-change: transform; }
-@media (prefers-reduced-motion: reduce) { .walker { display: none !important; } }
 .credit { position: absolute; bottom: 18px; inset-inline: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; }
 .collab { font-size: 13px; color: #b3a48d; }
 .collab b { color: #f1e8d8; font-weight: 700; }
@@ -243,7 +240,6 @@ table.items th { background: #ece3c8; font-weight: 700; }
     <div class="controls">
       <span>افحص المعاملة، ثم اختم بالاعتماد أو الرفض</span>
     </div>
-    <div class="walker" id="walker" hidden aria-hidden="true"></div>
     <div class="credit" id="credit-title"></div>
   </section>
 
@@ -1020,66 +1016,9 @@ function showEnd() {
   $("e-log").innerHTML = S.log.map((l, i) => { const g = l.right && l.env !== "taken"; return `<div class="mk"><i class="${g ? "ok" : "no"}">${g ? "✓" : "✗"}</i><small>${i + 1}</small></div>`; }).join("");
   (S.envTaken === 0 && !caught && S.correct >= n - 2) ? SFX.good() : SFX.bad();
 }
-/* ---------- idle walker: after 30s with no input on the title screen, walk in, stop, wave, walk out ---------- */
-const WALK_CELL = 250 * 120 / 420, WALK_LOOK = 4, WALK_IDLE = 4, WALK_WAVE = 5;
-let idleT = null, walkRAF = null, walkOn = false;
-function stopWalker() {
-  walkOn = false;
-  if (walkRAF) { cancelAnimationFrame(walkRAF); walkRAF = null; }
-  const w = $("walker"); if (w) { w.hidden = true; w.style.transform = ""; }
-}
-function setWalkFrame(i) { $("walker").style.backgroundPosition = (-i * WALK_CELL) + "px 0"; }
-function armIdle() {
-  clearTimeout(idleT);
-  if (!$("s-title").hidden) idleT = setTimeout(runWalker, 30000);
-}
-const WALK_SPEED = 70; // px per second, same for walking in and out so the feet match the ground
-const WALK_STEP_MS = 170; // one walk frame every 170ms: 4 frames = one full stride
-function runWalker() {
-  if ($("s-title").hidden || walkOn) return;
-  const el = $("walker"), W = $("s-title").clientWidth;
-  const startX = W + 10, stopX = W * 0.6, outX = -WALK_CELL - 10;
-  const inDur = (startX - stopX) / WALK_SPEED * 1000, outDur = (stopX - outX) / WALK_SPEED * 1000;
-  const phases = [
-    { k: "walk", from: startX, to: stopX, dur: inDur },
-    { k: "frame", frame: WALK_IDLE, dur: 1200 },
-    { k: "frame", frame: WALK_WAVE, dur: 2000 },
-    { k: "walk", from: stopX, to: outX, dur: outDur }
-  ];
-  let pi = 0, pStart = null, walkT = 0;
-  walkOn = true; el.hidden = false;
-  function tick(now) {
-    if (!walkOn) return;
-    if (pStart === null) pStart = now;
-    const p = phases[pi], k = Math.min(1, (now - pStart) / p.dur);
-    if (p.k === "walk") {
-      const f = Math.floor((now - pStart) / WALK_STEP_MS) % 4;
-      const bob = (f % 2) ? -2 : 0; // small lift on the passing poses
-      el.style.transform = "translate(" + (p.from + (p.to - p.from) * k) + "px," + bob + "px)";
-      setWalkFrame(f);
-    } else {
-      el.style.transform = "translate(" + stopX + "px,0px)"; // hold at the stop point while idle and waving
-      setWalkFrame(p.frame);
-    }
-    if (k >= 1) {
-      pi++; pStart = now;
-      if (pi >= phases.length) { stopWalker(); armIdle(); return; }
-    }
-    walkRAF = requestAnimationFrame(tick);
-  }
-  walkRAF = requestAnimationFrame(tick);
-}
-function userActivity() {
-  if (walkOn) stopWalker();
-  armIdle();
-}
-addEventListener("pointerdown", userActivity, { passive: true });
-addEventListener("keydown", userActivity);
-armIdle();
 
 function start() {
   ac(); if (AC && AC.state === "suspended") AC.resume();
-  stopWalker(); clearTimeout(idleT);
   CASES = drawRound();
   S = fresh(); setMeter();
   $("s-title").hidden = true; $("s-end").hidden = true; $("s-game").hidden = false;
