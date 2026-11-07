@@ -145,9 +145,12 @@ table.items th { background: #ece3c8; font-weight: 700; }
 .sheet .scroll::-webkit-scrollbar { width: 10px; }
 .sheet .scroll::-webkit-scrollbar-track { background: #e6dcc0; }
 .sheet .scroll::-webkit-scrollbar-thumb { background: #8a6a2a; border: 2px solid #e6dcc0; }
-.more { position: sticky; bottom: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 26px 10px 10px; margin-top: -40px; border: 0; background: linear-gradient(rgba(245,239,220,0), var(--paper) 55%); color: #3E4E8C; font-family: var(--f-ui); font-weight: 700; font-size: 14px; cursor: pointer; transition: opacity .25s; }
+.more { position: sticky; bottom: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; margin-top: 0; border: 0; background: var(--paper); color: #3E4E8C; font-family: var(--f-ui); font-weight: 700; font-size: 14px; cursor: pointer; transition: opacity .25s; }
 .more i { font-style: normal; display: inline-grid; place-items: center; width: 26px; height: 26px; background: #3E4E8C; color: #fff; animation: nudge 1s ease-in-out infinite; }
-.more.gone { opacity: 0; pointer-events: none; }
+.more.gone { display: none; }
+.law-d { margin: 0; }
+.law-d summary { cursor: pointer; color: var(--gold); font-size: 13px; font-weight: 600; list-style: none; padding: 6px 0; }
+.law-d[open] .law { margin-top: 6px; }
 @keyframes nudge { 50% { transform: translateY(4px); } }
 .mgr { margin: 10px 14px 0; padding: 8px 10px; background: #2A3A33; color: var(--text); font-family: var(--f-ui); font-size: 13px; line-height: 1.7; }
 .mgr span { color: var(--gold); font-weight: 600; }
@@ -175,6 +178,7 @@ table.items th { background: #ece3c8; font-weight: 700; }
 .verdict.bad h3 { color: #E06A5C; }
 .verdict p { margin: 0; font-size: 14px; line-height: 1.8; }
 .verdict .law { font-size: 12.5px; line-height: 1.8; color: var(--muted); border-inline-start: 3px solid var(--gold); padding-inline-start: 10px; }
+.verdict .law-d[hidden] { display: none !important; }
 .verdict .env-note { border-top: 1px dashed var(--line); padding-top: 8px; color: #F2D9A0; }
 .verdict button { padding: 12px; font-size: 16px; font-weight: 800; background: var(--gold); color: #1a1208; box-shadow: inset 0 -4px 0 rgba(0,0,0,.3); }
 
@@ -245,8 +249,7 @@ table.items th { background: #ece3c8; font-weight: 700; }
     <p>موظف جديد في إدارة المشتريات. افحص كل معاملة، طابقها مع اللائحة، واختم بالقرار الصحيح.</p>
     <button class="start" id="btn-start">ابدأ الدوام</button>
     <div class="controls">
-      <span>اقرأ المعاملة، طابقها مع اللائحة اللي تحتها، واختم</span>
-      <span>الكيبورد: → اعتماد · ← رفض · R اللائحة · Q/E الظرف</span>
+      <span>افحص المعاملة، ثم اختم بالاعتماد أو الرفض</span>
     </div>
     <div class="credit" id="credit-title"></div>
   </section>
@@ -255,7 +258,7 @@ table.items th { background: #ece3c8; font-weight: 700; }
    <div class="desk-col">
     <div class="hud">
       <span class="day">اليوم الأول</span>
-      <span class="count" id="hud-count">1 / 7</span>
+      <span class="count" id="hud-count" dir="ltr">1 / 7</span>
       <button class="icon-btn" id="btn-mute" aria-label="كتم الصوت">صوت</button>
     </div>
     <div class="stage" id="stage">
@@ -332,7 +335,7 @@ table.items th { background: #ece3c8; font-weight: 700; }
       <div class="verdict" id="verdict" role="dialog" aria-live="polite">
         <h3 id="v-title"></h3>
         <p id="v-text"></p>
-        <p class="law" id="v-law" hidden></p>
+        <details class="law-d" id="v-law-d" hidden><summary>اقرأ نص المادة</summary><p class="law" id="v-law"></p></details>
         <p class="env-note" id="v-env" hidden></p>
         <button id="btn-next"><span class="key" style="position:static;margin-inline-end:6px">Enter</span>المعاملة التالية</button>
       </div>
@@ -989,7 +992,7 @@ function showVerdict(c, approve, right) {
   v.className = "verdict " + (right ? "good" : "bad");
   $("v-title").textContent = right ? (approve ? "اعتماد صحيح" : "رفض صحيح") : (approve ? "اعتمدت معاملة مخالفة" : "رفضت معاملة سليمة");
   $("v-text").textContent = c.explain;
-  $("v-law").hidden = !c.law; $("v-law").textContent = c.law || "";
+  $("v-law-d").hidden = !c.law; $("v-law").textContent = c.law || ""; $("v-law-d").open = false;
   const en = $("v-env");
   if (c.envelope) {
     en.hidden = false;
