@@ -1,0 +1,8 @@
+{
+  "titleAr": "سبعة طوابق",
+  "titleEn": "SEVEN FLOORS",
+  "protagonistId": "hero",
+  "startLocation": "apartment_hero",
+  "totalDays": 7,
+  "startDialogue": "day1_intro"
+}

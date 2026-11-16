@@ -1,0 +1,31 @@
+{
+  "characters": [
+    {
+      "id": "hero",
+      "name": "البطل",
+      "nameColor": "#8FB8E8",
+      "flipWhenRight": true,
+      "flipWhenLeft": false,
+      "scale": 1.0,
+      "note": "الشخصية الرئيسية — تُعرض دائماً في يمين الشاشة وتُقلب لتواجه الطرف المقابل. الاسم مؤقت."
+    },
+    {
+      "id": "old_man",
+      "name": "الجار العجوز",
+      "nameColor": "#D8B06A",
+      "flipWhenRight": false,
+      "flipWhenLeft": false,
+      "scale": 1.0,
+      "note": "الجار المتهور الذي يستهين بالخطر ويقرر النزول — مشهد مقتله هو إنذار السكان الأول. الاسم مؤقت."
+    },
+    {
+      "id": "neighbor_woman",
+      "name": "الجارة",
+      "nameColor": "#C790A8",
+      "flipWhenRight": false,
+      "flipWhenLeft": false,
+      "scale": 1.0,
+      "note": "جارة في نفس الطابق. الاسم مؤقت."
+    }
+  ]
+}

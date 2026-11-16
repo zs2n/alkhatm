@@ -1,0 +1,11 @@
+{
+  "days": [
+    { "day": 1, "title": "اليوم الأول", "intro": "" },
+    { "day": 2, "title": "اليوم الثاني", "intro": "day_generic_intro" },
+    { "day": 3, "title": "اليوم الثالث", "intro": "day_generic_intro" },
+    { "day": 4, "title": "اليوم الرابع", "intro": "day_generic_intro" },
+    { "day": 5, "title": "اليوم الخامس", "intro": "day_generic_intro" },
+    { "day": 6, "title": "اليوم السادس", "intro": "day_generic_intro" },
+    { "day": 7, "title": "اليوم السابع", "intro": "day7_intro" }
+  ]
+}
