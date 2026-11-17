@@ -856,9 +856,47 @@ const P = [
   "WWWWWWWTTTTTTtTTTTTTTWWWWWWW", "WWWWWTTTTTTTTtTTTTTTTTTWWWWW", "WWWTTTTTTTTTTtTTTTTTTTTTTWWW",
   "WTTTTTTTTTTTTTTTTTTTTTTTTTTW", "TTTTTTTTTTTTTTTTTTTTTTTTTTTT"];
 const PAL = { K: "#141414", S: "#C68A5A", s: "#A86F44", H: "#1E1A18", m: "#6E3A2A", T: "#FFFFFF", t: "#CFCAC0" };
-function drawPortrait(talk) {
+// Messenger (المندوب): own portrait, same 28x28 grid. H = mouth (darkens while talking).
+const MESSENGER = [
+  "............................",
+  "............................",
+  "............................",
+  "........AAAAAAAAAAAA........",
+  ".......AAAAAAAAAAAAAA.......",
+  ".......AAAAABBBBAAAAA.......",
+  ".......AAAAAAAAAAAAAA.......",
+  ".......AAAAAAAAAAAAAA.......",
+  "......CCCCCCCCCCCCCCCC......",
+  "......CDDCCCCCCCCCCDDC......",
+  ".......DDEEEEEEEEEEDD.......",
+  ".......EEDDDDEEDDDDEE.......",
+  ".......EEEEEEEEEEEEEE.......",
+  ".......EEEFFEEEEFFEEE.......",
+  ".......EEEEEEEEEEEEEE.......",
+  ".......EEEEEEEEEEEEEE.......",
+  "........GEEGHHHHGEEG........",
+  "........GIIGGGGGGIIG........",
+  "........GGGGGGGGGGGG........",
+  "........GGGGGGGGGGGG........",
+  "............IIII............",
+  "..JJKKKKKKKKLLLLKKKKKKKKJJ..",
+  "..JJJJJKKJJJLLLLJJJKKJJJJJ..",
+  "..JJJJJKKJJJJLLJJJJKKJJJJJ..",
+  "..JJJJJKKJJJJLLJJJJKKJJJJJ..",
+  "..JJJJJKKJJJJLLJJJJKKJJJJJ..",
+  "..JJJJJKKJJJJLLJJJJKKJJJJJ..",
+  "..JJJJJKKJJJJLLJJJJKKJJJJJ.."];
+const MESSENGER_PAL = {"A": "#2C3E6B", "B": "#E9A23B", "C": "#1E2A4A", "D": "#1E1A18", "E": "#B87C50", "F": "#141414", "G": "#382820", "H": "#6E3A2A", "I": "#96603C", "J": "#8FB3D9", "K": "#46608C", "L": "#C0392B"};
+function drawPortrait(talk, who = "المدير") {
   const pc = $("portrait").getContext("2d");
   pc.fillStyle = "#2A3A33"; pc.fillRect(0, 0, 28, 28);
+  if (who === "المندوب") {
+    MESSENGER.forEach((row, y) => [...row].forEach((ch, x) => {
+      if (ch === ".") return;
+      pc.fillStyle = (talk && ch === "H") ? "#3a1a12" : MESSENGER_PAL[ch]; pc.fillRect(x, y, 1, 1);
+    }));
+    return;
+  }
   P.forEach((row, y) => [...row].forEach((ch, x) => {
     if (ch === ".") return;
     let c = ch === "W" ? (((x + y) % 4 === 0 || (x - y + 40) % 4 === 0) ? "#C0392B" : "#F4F1EA") : PAL[ch];
@@ -876,9 +914,9 @@ function say(who, text) {
   clearInterval(typeTimer); let k = 0;
   typeTimer = setInterval(() => {
     k++; el.textContent = text.slice(0, k);
-    if (who === "المدير") { mouth ^= 1; drawPortrait(mouth); }
+    if (who === "المدير" || who === "المندوب") { mouth ^= 1; drawPortrait(mouth, who); }
     if (k % 3 === 0) SFX.blip();
-    if (k >= text.length) { clearInterval(typeTimer); drawPortrait(false); }
+    if (k >= text.length) { clearInterval(typeTimer); drawPortrait(false, who); }
   }, 32);
 }
 
